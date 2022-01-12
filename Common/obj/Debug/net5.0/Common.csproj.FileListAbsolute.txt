@@ -1,0 +1,15 @@
+D:\01_code\MyCode\MyFrameWork\NetCoreBase3.1\MyNetCore\Common\bin\Debug\net5.0\Roim.Common.deps.json
+D:\01_code\MyCode\MyFrameWork\NetCoreBase3.1\MyNetCore\Common\bin\Debug\net5.0\Roim.Common.dll
+D:\01_code\MyCode\MyFrameWork\NetCoreBase3.1\MyNetCore\Common\bin\Debug\net5.0\ref\Roim.Common.dll
+D:\01_code\MyCode\MyFrameWork\NetCoreBase3.1\MyNetCore\Common\bin\Debug\net5.0\Roim.Common.pdb
+D:\01_code\MyCode\MyFrameWork\NetCoreBase3.1\MyNetCore\Common\bin\Debug\net5.0\Microsoft.AspNetCore.Mvc.ViewFeatures.dll
+D:\01_code\MyCode\MyFrameWork\NetCoreBase3.1\MyNetCore\Common\bin\Debug\net5.0\Microsoft.AspNetCore.Mvc.ViewFeatures.xml
+D:\01_code\MyCode\MyFrameWork\NetCoreBase3.1\MyNetCore\Common\obj\Debug\net5.0\Common.GeneratedMSBuildEditorConfig.editorconfig
+D:\01_code\MyCode\MyFrameWork\NetCoreBase3.1\MyNetCore\Common\obj\Debug\net5.0\Common.AssemblyInfoInputs.cache
+D:\01_code\MyCode\MyFrameWork\NetCoreBase3.1\MyNetCore\Common\obj\Debug\net5.0\Common.AssemblyInfo.cs
+D:\01_code\MyCode\MyFrameWork\NetCoreBase3.1\MyNetCore\Common\obj\Debug\net5.0\Common.csproj.CoreCompileInputs.cache
+D:\01_code\MyCode\MyFrameWork\NetCoreBase3.1\MyNetCore\Common\obj\Debug\net5.0\Common.csproj.CopyComplete
+D:\01_code\MyCode\MyFrameWork\NetCoreBase3.1\MyNetCore\Common\obj\Debug\net5.0\Roim.Common.dll
+D:\01_code\MyCode\MyFrameWork\NetCoreBase3.1\MyNetCore\Common\obj\Debug\net5.0\ref\Roim.Common.dll
+D:\01_code\MyCode\MyFrameWork\NetCoreBase3.1\MyNetCore\Common\obj\Debug\net5.0\Roim.Common.pdb
+D:\01_code\MyCode\MyFrameWork\NetCoreBase3.1\MyNetCore\Common\obj\Debug\net5.0\Common.csprojAssemblyReference.cache
