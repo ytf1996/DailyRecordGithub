@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <_PublishTargetUrl>C:\Users\16273\Desktop\DailyRecord\MyNetCore\bin\Debug\netcoreapp3.1\publish\</_PublishTargetUrl>
+    <History>True|2022-01-12T07:53:02.2599415Z;True|2022-01-12T15:48:52.0108476+08:00;True|2022-01-12T15:20:57.8288975+08:00;True|2022-01-12T15:09:10.0136452+08:00;True|2022-01-12T14:57:43.3646295+08:00;True|2022-01-12T14:52:35.9423222+08:00;True|2022-01-12T14:51:53.6890919+08:00;False|2022-01-12T14:51:06.8730624+08:00;True|2022-01-12T14:44:55.3945980+08:00;True|2022-01-12T14:43:39.1949482+08:00;True|2022-01-12T14:35:57.7283405+08:00;</History>
+  </PropertyGroup>
+</Project>

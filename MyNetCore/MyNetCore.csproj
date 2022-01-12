@@ -8,6 +8,10 @@
     <UserSecretsId>12e087a4-8656-4cad-9239-768ee0a8c897</UserSecretsId>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <WarningLevel>5</WarningLevel>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="Areas\Management\Data\**" />
     <Compile Remove="Areas\Management\Models\**" />

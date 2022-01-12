@@ -3,7 +3,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iis": {
-      "applicationUrl": "http://localhost:80/",
+      "applicationUrl": "http://localhost:8060/",
       "sslPort": 0
     },
     "iisExpress": {
@@ -20,7 +20,7 @@
       }
     },
     "MyNetCore": {
-      "commandName": "Project",
+      "commandName": "IIS",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
