@@ -230,3 +230,4 @@ C:\Users\16273\Desktop\DailyRecord\Common\obj\Debug\netcoreapp3.1\Common.csproj.
 C:\Users\16273\Desktop\DailyRecord\Common\obj\Debug\netcoreapp3.1\Common.csproj.CopyComplete
 C:\Users\16273\Desktop\DailyRecord\Common\obj\Debug\netcoreapp3.1\Roim.Common.dll
 C:\Users\16273\Desktop\DailyRecord\Common\obj\Debug\netcoreapp3.1\Roim.Common.pdb
+C:\Users\16273\Desktop\DailyRecord\Common\obj\Debug\netcoreapp3.1\Common.csproj.AssemblyReference.cache

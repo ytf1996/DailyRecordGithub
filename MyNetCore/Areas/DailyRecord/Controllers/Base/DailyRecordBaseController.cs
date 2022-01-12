@@ -16,6 +16,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
     [Area("DailyRecord")]
     public class DailyRecordBaseController : CommonController
     {
+        [HttpPost]
         public IActionResult LogInWxMini(string code, string nickName, string avatarUrl, string gender)
         {
             WeChatMiniHelper weChatBaseHelper = new WeChatMiniHelper(WeChatMiniSettingParam.MyConfig.WxOpenAppId, WeChatMiniSettingParam.MyConfig.WxOpenAppSecret);
