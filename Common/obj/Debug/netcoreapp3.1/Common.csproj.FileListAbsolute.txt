@@ -223,7 +223,6 @@ C:\Users\16273\Desktop\DailyRecord\Common\bin\Debug\netcoreapp3.1\Microsoft.Exte
 C:\Users\16273\Desktop\DailyRecord\Common\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Configuration.Abstractions.xml
 C:\Users\16273\Desktop\DailyRecord\Common\bin\Debug\netcoreapp3.1\Microsoft.AspNetCore.Hosting.Server.Abstractions.xml
 C:\Users\16273\Desktop\DailyRecord\Common\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Hosting.Abstractions.xml
-C:\Users\16273\Desktop\DailyRecord\Common\obj\Debug\netcoreapp3.1\Common.csproj.AssemblyReference.cache
 C:\Users\16273\Desktop\DailyRecord\Common\obj\Debug\netcoreapp3.1\Common.GeneratedMSBuildEditorConfig.editorconfig
 C:\Users\16273\Desktop\DailyRecord\Common\obj\Debug\netcoreapp3.1\Common.AssemblyInfoInputs.cache
 C:\Users\16273\Desktop\DailyRecord\Common\obj\Debug\netcoreapp3.1\Common.AssemblyInfo.cs

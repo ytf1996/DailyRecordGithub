@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace MyNetCore.Areas.WeChatMini.Controllers
 {
-    public class NoteController : WeChatMiniBaseWithAuthController
+    public class NoteController : WeChatMiniBaseWithAuthController  
     {
         /// <summary>
         /// 获取记事本列表
