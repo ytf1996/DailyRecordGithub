@@ -401,6 +401,49 @@ namespace MyNetCore.Migrations
                     b.ToTable("ErrorLog");
                 });
 
+            modelBuilder.Entity("MyNetCore.Models.JobClassificationInfo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ClassificationName")
+                        .HasColumnType("varchar(50) CHARACTER SET utf8mb4")
+                        .HasMaxLength(50);
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("varchar(50) CHARACTER SET utf8mb4")
+                        .HasMaxLength(50);
+
+                    b.Property<int?>("TerritoryId")
+                        .HasColumnName("TerritoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("JobClassificationInfo");
+                });
+
             modelBuilder.Entity("MyNetCore.Models.LatLngHistory", b =>
                 {
                     b.Property<int>("Id")
@@ -1010,6 +1053,86 @@ namespace MyNetCore.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("MyNetCore.Models.WorkDiaryInfo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("Id")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("BegWorkTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<DateTime>("EndWorkTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<decimal?>("ExtraWorkHour")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<int>("JobClassificationInfoId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("JobContent")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4")
+                        .HasMaxLength(4000);
+
+                    b.Property<string>("Name")
+                        .HasColumnType("varchar(50) CHARACTER SET utf8mb4")
+                        .HasMaxLength(50);
+
+                    b.Property<decimal>("NormalWorkHour")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<string>("Remark")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4")
+                        .HasMaxLength(4000);
+
+                    b.Property<decimal>("SubtotalWorkHour")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<int?>("TerritoryId")
+                        .HasColumnName("TerritoryId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("TimeOfBirth")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("TravelSite")
+                        .HasColumnType("varchar(50) CHARACTER SET utf8mb4")
+                        .HasMaxLength(50);
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("WhatDay")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("WhetherOnBusinessTrip")
+                        .HasColumnType("tinyint(1)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("JobClassificationInfoId");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("WorkDiaryInfo");
+                });
+
             modelBuilder.Entity("MyNetCore.Models.Workflow", b =>
                 {
                     b.Property<int>("Id")
@@ -1511,6 +1634,17 @@ namespace MyNetCore.Migrations
                         .HasForeignKey("UpdatedById");
                 });
 
+            modelBuilder.Entity("MyNetCore.Models.JobClassificationInfo", b =>
+                {
+                    b.HasOne("MyNetCore.Models.Users", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("MyNetCore.Models.Users", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById");
+                });
+
             modelBuilder.Entity("MyNetCore.Models.LatLngHistory", b =>
                 {
                     b.HasOne("MyNetCore.Models.Users", "CreatedBy")
@@ -1622,6 +1756,23 @@ namespace MyNetCore.Migrations
                     b.HasOne("MyNetCore.Models.Users", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
+
+                    b.HasOne("MyNetCore.Models.Users", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById");
+                });
+
+            modelBuilder.Entity("MyNetCore.Models.WorkDiaryInfo", b =>
+                {
+                    b.HasOne("MyNetCore.Models.Users", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("MyNetCore.Models.JobClassificationInfo", "JobClassificationInfo")
+                        .WithMany()
+                        .HasForeignKey("JobClassificationInfoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("MyNetCore.Models.Users", "UpdatedBy")
                         .WithMany()

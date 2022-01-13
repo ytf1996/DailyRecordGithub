@@ -279,6 +279,24 @@ namespace MyNetCore.Models
         /// </summary>
         [Display(Name = "微信小程序用户")]
         WeChatMini = 40,
+
+        /// <summary>
+        /// 开发工程师
+        /// </summary>
+        [Display(Name = "开发工程师")]
+        DevelopmentEngineer = 50,
+
+        /// <summary>
+        /// 测试工程师
+        /// </summary>
+        [Display(Name = "测试工程师")]
+        TestEngineer = 60,
+
+        /// <summary>
+        /// 实施工程师
+        /// </summary>
+        [Display(Name = "实施工程师")]
+        ImplementationEngineer = 70
     }
 
     /// <summary>

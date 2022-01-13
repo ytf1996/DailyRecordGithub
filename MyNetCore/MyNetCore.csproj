@@ -61,7 +61,6 @@
 
   <ItemGroup>
     <Folder Include="Areas\DailyRecord\Data\" />
-    <Folder Include="Areas\DailyRecord\Models\" />
     <Folder Include="Areas\DailyRecord\Views\" />
     <Folder Include="Areas\WeChatMini\Data\" />
     <Folder Include="Areas\WeChatMini\Models\" />

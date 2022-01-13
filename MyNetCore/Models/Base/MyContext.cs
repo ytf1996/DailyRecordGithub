@@ -159,5 +159,22 @@ namespace MyNetCore.Models
         /// </summary>
         public DbSet<BabyInfoDaliyProgress> WorkflowProgressBabyInfo { get; set; }
         #endregion
+
+        #region 日志周报
+        /// <summary>
+        /// 工作分类
+        /// </summary>
+        public DbSet<JobClassificationInfo> JobClassificationInfo { get; set; }
+
+        /// <summary>
+        /// 工作日志
+        /// </summary>
+        public virtual DbSet<WorkDiaryInfo> WorkDiaryInfo { get; set; }
+
+        /// <summary>
+        /// 下周计划
+        /// </summary>
+        public DbSet<PlanNextWeekInfo> PlanNextWeekInfo { get; set; }
+        #endregion
     }
 }

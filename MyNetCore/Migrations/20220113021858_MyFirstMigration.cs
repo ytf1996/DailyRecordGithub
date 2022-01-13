@@ -250,6 +250,38 @@ namespace MyNetCore.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "JobClassificationInfo",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(maxLength: 50, nullable: true),
+                    TerritoryId = table.Column<int>(nullable: true),
+                    CreatedById = table.Column<int>(nullable: true),
+                    CreatedDate = table.Column<DateTime>(nullable: false),
+                    UpdatedById = table.Column<int>(nullable: true),
+                    UpdatedDate = table.Column<DateTime>(nullable: false),
+                    Deleted = table.Column<bool>(nullable: false),
+                    ClassificationName = table.Column<string>(maxLength: 50, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_JobClassificationInfo", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_JobClassificationInfo_Users_CreatedById",
+                        column: x => x.CreatedById,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_JobClassificationInfo_Users_UpdatedById",
+                        column: x => x.UpdatedById,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "LatLngHistory",
                 columns: table => new
                 {
@@ -537,6 +569,55 @@ namespace MyNetCore.Migrations
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Workflow_Users_UpdatedById",
+                        column: x => x.UpdatedById,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WorkDiaryInfo",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(maxLength: 50, nullable: true),
+                    TerritoryId = table.Column<int>(nullable: true),
+                    CreatedById = table.Column<int>(nullable: true),
+                    CreatedDate = table.Column<DateTime>(nullable: false),
+                    UpdatedById = table.Column<int>(nullable: true),
+                    UpdatedDate = table.Column<DateTime>(nullable: false),
+                    Deleted = table.Column<bool>(nullable: false),
+                    TimeOfBirth = table.Column<DateTime>(nullable: false),
+                    WhatDay = table.Column<int>(nullable: false),
+                    WhetherOnBusinessTrip = table.Column<bool>(nullable: false),
+                    TravelSite = table.Column<string>(maxLength: 50, nullable: true),
+                    JobClassificationInfoId = table.Column<int>(nullable: false),
+                    JobContent = table.Column<string>(maxLength: 4000, nullable: true),
+                    BegWorkTime = table.Column<DateTime>(nullable: false),
+                    EndWorkTime = table.Column<DateTime>(nullable: false),
+                    NormalWorkHour = table.Column<decimal>(nullable: false),
+                    ExtraWorkHour = table.Column<decimal>(nullable: true),
+                    SubtotalWorkHour = table.Column<decimal>(nullable: false),
+                    Remark = table.Column<string>(maxLength: 4000, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WorkDiaryInfo", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WorkDiaryInfo_Users_CreatedById",
+                        column: x => x.CreatedById,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_WorkDiaryInfo_JobClassificationInfo_JobClassificationInfoId",
+                        column: x => x.JobClassificationInfoId,
+                        principalTable: "JobClassificationInfo",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_WorkDiaryInfo_Users_UpdatedById",
                         column: x => x.UpdatedById,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -1066,6 +1147,16 @@ namespace MyNetCore.Migrations
                 column: "UpdatedById");
 
             migrationBuilder.CreateIndex(
+                name: "IX_JobClassificationInfo_CreatedById",
+                table: "JobClassificationInfo",
+                column: "CreatedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_JobClassificationInfo_UpdatedById",
+                table: "JobClassificationInfo",
+                column: "UpdatedById");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_LatLngHistory_CreatedById",
                 table: "LatLngHistory",
                 column: "CreatedById");
@@ -1168,6 +1259,21 @@ namespace MyNetCore.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_TerritoryProfiles_UpdatedById",
                 table: "TerritoryProfiles",
+                column: "UpdatedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkDiaryInfo_CreatedById",
+                table: "WorkDiaryInfo",
+                column: "CreatedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkDiaryInfo_JobClassificationInfoId",
+                table: "WorkDiaryInfo",
+                column: "JobClassificationInfoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkDiaryInfo_UpdatedById",
+                table: "WorkDiaryInfo",
                 column: "UpdatedById");
 
             migrationBuilder.CreateIndex(
@@ -1351,6 +1457,9 @@ namespace MyNetCore.Migrations
                 name: "ToolModel");
 
             migrationBuilder.DropTable(
+                name: "WorkDiaryInfo");
+
+            migrationBuilder.DropTable(
                 name: "WorkflowAction");
 
             migrationBuilder.DropTable(
@@ -1370,6 +1479,9 @@ namespace MyNetCore.Migrations
 
             migrationBuilder.DropTable(
                 name: "TaskModel");
+
+            migrationBuilder.DropTable(
+                name: "JobClassificationInfo");
 
             migrationBuilder.DropTable(
                 name: "WorkflowInstance");
