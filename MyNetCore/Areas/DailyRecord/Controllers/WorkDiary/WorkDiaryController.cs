@@ -27,7 +27,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
             {
                 predicate = x => x.Dt >= begDate && x.Dt <= endDate;
             }
-            var list = _businessWorkDiary.GetList(null, out int totalCount, predicate, "Dt", needCheckRight: false);
+            var list = _businessWorkDiary.GetList(null, out int totalCount, predicate, "Dt");
 
             var result = list.ToList();
 
@@ -62,7 +62,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
             //    throw new LogicException("工作内容不能为空");
             //}
 
-            _businessWorkDiary.Add(workDiaryInfo, needCheckRight: false);
+            _businessWorkDiary.Add(workDiaryInfo);
             return Success();
         }
 
@@ -73,7 +73,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         /// <returns></returns>
         public IActionResult Get(int id)
         {
-            var workDiaryInfo = _businessWorkDiary.GetById(id, needCheckRight: false);
+            var workDiaryInfo = _businessWorkDiary.GetById(id);
             return Success(data: workDiaryInfo);
         }
 
@@ -94,7 +94,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 throw new LogicException("星期必须在1-7之间");
             }
 
-            var workDiaryInfoDB = _businessWorkDiary.GetById(workDiaryInfo.Id, needCheckRight: false);
+            var workDiaryInfoDB = _businessWorkDiary.GetById(workDiaryInfo.Id);
             workDiaryInfoDB.Dt = workDiaryInfo.Dt;
             workDiaryInfoDB.WhatDay = workDiaryInfo.WhatDay;
             workDiaryInfoDB.WhetherOnBusinessTrip = workDiaryInfo.WhetherOnBusinessTrip;
@@ -108,7 +108,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
             workDiaryInfoDB.SubtotalWorkHour = workDiaryInfo.SubtotalWorkHour;
             workDiaryInfoDB.Remark = workDiaryInfo.Remark;
 
-            _businessWorkDiary.Edit(workDiaryInfoDB, needCheckRight: false);
+            _businessWorkDiary.Edit(workDiaryInfoDB);
             return Success();
         }
 
@@ -120,7 +120,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         [HttpDelete]
         public IActionResult Delete([FromRoute] int id)
         {
-            _businessWorkDiary.DeleteById(id, needCheckRight: false);
+            _businessWorkDiary.DeleteById(id);
             return Success();
         }
     }

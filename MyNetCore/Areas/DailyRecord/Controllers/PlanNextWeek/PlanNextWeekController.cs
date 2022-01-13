@@ -27,7 +27,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
             {
                 predicate = x => x.Beg == beg;
             }
-            var list = _businessPlanNextWeek.GetList(null, out int totalCount, predicate, needCheckRight: false);
+            var list = _businessPlanNextWeek.GetList(null, out int totalCount, predicate);
 
             var result = list.ToList();
 
@@ -55,7 +55,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 throw new LogicException("工作计划安排内容不能为空");
             }
 
-            _businessPlanNextWeek.Add(pPlanNextWeekInfo, needCheckRight: false);
+            _businessPlanNextWeek.Add(pPlanNextWeekInfo);
             return Success();
         }
 
@@ -66,7 +66,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         /// <returns></returns>
         public IActionResult Get(int id)
         {
-            var pPlanNextWeekInfo = _businessPlanNextWeek.GetById(id, needCheckRight: false);
+            var pPlanNextWeekInfo = _businessPlanNextWeek.GetById(id);
             return Success(data: pPlanNextWeekInfo);
         }
 
@@ -91,12 +91,12 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 throw new LogicException("工作计划安排内容不能为空");
             }
 
-            var workDiaryInfoDB = _businessPlanNextWeek.GetById(pPlanNextWeekInfo.Id, needCheckRight: false);
+            var workDiaryInfoDB = _businessPlanNextWeek.GetById(pPlanNextWeekInfo.Id);
             workDiaryInfoDB.Beg = pPlanNextWeekInfo.Beg;
             workDiaryInfoDB.JobClassificationInfoId = pPlanNextWeekInfo.JobClassificationInfoId;
             workDiaryInfoDB.JobContent = pPlanNextWeekInfo.JobContent;
 
-            _businessPlanNextWeek.Edit(workDiaryInfoDB, needCheckRight: false);
+            _businessPlanNextWeek.Edit(workDiaryInfoDB);
             return Success();
         }
 
@@ -108,7 +108,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         [HttpDelete]
         public IActionResult Delete([FromRoute] int id)
         {
-            _businessPlanNextWeek.DeleteById(id, needCheckRight: false);
+            _businessPlanNextWeek.DeleteById(id);
             return Success();
         }
     }

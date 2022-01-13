@@ -12,22 +12,22 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
     {
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            //string accessToken = filterContext.HttpContext.Request.Headers["accessToken"];
+            string accessToken = filterContext.HttpContext.Request.Headers["accessToken"];
 
-            //if (string.IsNullOrWhiteSpace(accessToken))
-            //{
-            //    throw new Exception("未能获取accessToken，请重新打开应用");
-            //}
+            if (string.IsNullOrWhiteSpace(accessToken))
+            {
+                throw new Exception("未能获取accessToken，请重新打开应用");
+            }
 
-            //var currentUser = GetCurrentUserInfo(accessToken);
-            //if (currentUser == null || currentUser.Id == 0)
-            //{
-            //    throw new Exception("请重新打开应用");
-            //}
-            //if (currentUser.Disabled)
-            //{
-            //    throw new Exception("该用户被禁用");
-            //}
+            var currentUser = GetCurrentUserInfo(accessToken);
+            if (currentUser == null || currentUser.Id == 0)
+            {
+                throw new Exception("请重新打开应用");
+            }
+            if (currentUser.Disabled)
+            {
+                throw new Exception("该用户被禁用");
+            }
         }
     }
 }
