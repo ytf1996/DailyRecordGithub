@@ -2,3 +2,5 @@ obj
 bin
 .suo
 FolderProfile1.pubxml.user
+MyNetCore.csproj.user
+.vs
