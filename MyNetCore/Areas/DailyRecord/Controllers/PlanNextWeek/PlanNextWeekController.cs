@@ -2,8 +2,8 @@
 using MyNetCore.Business;
 using MyNetCore.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 
 namespace MyNetCore.Areas.DailyRecord.Controllers
 {
@@ -15,24 +15,56 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         /// 获取自然周开始时间的工作计划安排
         /// </summary>
         /// <returns></returns>
-        public IActionResult List(DateTime beg)
+        public IActionResult List(DateTime begDate)
         {
-            Expression<Func<PlanNextWeekInfo, bool>> predicate;
-            var currentUser = GetCurrentUserInfo();
-            if (currentUser != null && currentUser.UserType != UserType.Admin)
-            {
-                predicate = x => x.Beg == beg && x.CreatedById == currentUser.Id;
-            }
-            else
-            {
-                predicate = x => x.Beg == beg;
-            }
-            var list = _businessPlanNextWeek.GetList(null, out int totalCount, predicate);
+            _businessPlanNextWeek.CheckDate(begDate);
 
-            var result = list.ToList();
+            var currentUser = GetCurrentUserInfo();
+            if (currentUser == null)
+            {
+                throw new Exception("用户未登录");
+            }
+
+            var beflist = _businessPlanNextWeek.GetList(null, out int beftotalCount, x => x.BegDate == begDate && x.CreatedById == currentUser.Id, "ProjectClassificationInfoId");
+
+            var befesult = beflist.ToList();
+
+            //_businessPlanNextWeek.AddDefaultItemWhenNotexist(befesult, begDate);//检查并新增空默认行项
+
+            //var aftlist = _businessPlanNextWeek.GetList(null, out int afttotalCount, x => x.Beg == begDate && x.CreatedById == currentUser.Id, "ProjectClassificationInfoId");
+
+            //var aftresult = aftlist.ToList();
+
+            return Success(data: befesult);
+        }
+
+
+        /// <summary>
+        /// 获取自然周开始时间的工作计划安排(管理员)
+        /// </summary>
+        /// <param name="begDate"></param>
+        /// <returns></returns>
+        public IActionResult List_ShowAll_ForAdministrator(DateTime begDate)
+        {
+            _businessPlanNextWeek.CheckDate(begDate);
+
+            var currentUser = GetCurrentUserInfo();
+            if (currentUser == null)
+            {
+                throw new Exception("用户未登录");
+            }
+            if (!currentUser.IsAdmin)
+            {
+                throw new Exception("您无此操作权限");
+            }
+
+            var list = _businessPlanNextWeek.GetList(null, out int totalCount, x => x.BegDate == begDate);
+
+            var result = list.OrderBy(x => x.CreatedById).ThenBy(x => x.ProjectClassificationInfoId).ToList();
 
             return Success(data: result);
         }
+
 
         /// <summary>
         /// 添加工作计划安排
@@ -40,35 +72,40 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         /// <param name="pPlanNextWeekInfo"></param>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult Add([FromBody] PlanNextWeekInfo pPlanNextWeekInfo)
+        public IActionResult Add([FromBody] PlanDto planDto)
         {
-            if (pPlanNextWeekInfo.Beg == DateTime.MinValue)
+            var currentUser = GetCurrentUserInfo();
+            if (currentUser == null)
             {
-                throw new LogicException("自然周日期不能为空");
-            }
-            if (pPlanNextWeekInfo.JobClassificationInfoId == 0)
-            {
-                throw new LogicException("项目分类不能为空");
-            }
-            if (string.IsNullOrWhiteSpace(pPlanNextWeekInfo.JobContent))
-            {
-                throw new LogicException("工作计划安排内容不能为空");
+                throw new Exception("用户未登录");
             }
 
-            _businessPlanNextWeek.Add(pPlanNextWeekInfo);
+            _businessPlanNextWeek.CheckDate(planDto.BegDate);
+
+            foreach (var item in planDto.ItemList)
+            {
+                if (item.ProjectClassificationInfoId == 0)
+                {
+                    throw new LogicException("项目分类不能为空");
+                }
+                if (string.IsNullOrWhiteSpace(item.JobContent))
+                {
+                    throw new LogicException("工作计划安排内容不能为空");
+                }
+
+                _businessPlanNextWeek.CheckRepeat(planDto.BegDate, item.ProjectClassificationInfoId, currentUser);
+                var pPlanNextWeekInfo = new PlanNextWeekInfo
+                {
+                    BegDate = planDto.BegDate,
+                    ProjectClassificationInfoId = item.ProjectClassificationInfoId,
+                    JobContent = item.JobContent
+                };
+
+                _businessPlanNextWeek.Add(pPlanNextWeekInfo);
+            }
             return Success();
         }
 
-        /// <summary>
-        /// 获取单条工作计划安排
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public IActionResult Get(int id)
-        {
-            var pPlanNextWeekInfo = _businessPlanNextWeek.GetById(id);
-            return Success(data: pPlanNextWeekInfo);
-        }
 
         /// <summary>
         /// 修改工作计划安排
@@ -76,39 +113,49 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         /// <param name="pPlanNextWeekInfo"></param>
         /// <returns></returns>
         [HttpPut]
-        public IActionResult Edit([FromBody] PlanNextWeekInfo pPlanNextWeekInfo)
+        public IActionResult Edit([FromBody] List<PlanNextWeekInfo> pPlanNextWeekInfoList)
         {
-            if (pPlanNextWeekInfo.Beg == DateTime.MinValue)
+            var currentUser = GetCurrentUserInfo();
+            if (currentUser == null)
             {
-                throw new LogicException("自然周日期不能为空");
-            }
-            if (pPlanNextWeekInfo.JobClassificationInfoId == 0)
-            {
-                throw new LogicException("项目分类不能为空");
-            }
-            if (string.IsNullOrWhiteSpace(pPlanNextWeekInfo.JobContent))
-            {
-                throw new LogicException("工作计划安排内容不能为空");
+                throw new Exception("用户未登录");
             }
 
-            var workDiaryInfoDB = _businessPlanNextWeek.GetById(pPlanNextWeekInfo.Id);
-            workDiaryInfoDB.Beg = pPlanNextWeekInfo.Beg;
-            workDiaryInfoDB.JobClassificationInfoId = pPlanNextWeekInfo.JobClassificationInfoId;
-            workDiaryInfoDB.JobContent = pPlanNextWeekInfo.JobContent;
+            foreach (var pPlanNextWeekInfo in pPlanNextWeekInfoList)
+            {
+                var pPlanNextWeekInfoDB = _businessPlanNextWeek.GetById(pPlanNextWeekInfo.Id);
+                if (pPlanNextWeekInfoDB == null)
+                {
+                    throw new LogicException($"不存在主键id为{pPlanNextWeekInfo.Id}的下周计划记录");
+                }
+                if (!currentUser.IsAdmin && pPlanNextWeekInfoDB.CreatedById != currentUser.Id)
+                {
+                    throw new Exception("非管理员没有权限修改他人的记录");
+                }
 
-            _businessPlanNextWeek.Edit(workDiaryInfoDB);
-            return Success();
-        }
+                _businessPlanNextWeek.CheckDate(pPlanNextWeekInfo.BegDate);
 
-        /// <summary>
-        /// 删除工作计划安排
-        /// </summary>
-        /// <param name="pPlanNextWeekInfo"></param>
-        /// <returns></returns>
-        [HttpDelete]
-        public IActionResult Delete([FromRoute] int id)
-        {
-            _businessPlanNextWeek.DeleteById(id);
+                _businessPlanNextWeek.CheckRepeat(pPlanNextWeekInfo.BegDate, pPlanNextWeekInfo.ProjectClassificationInfoId, currentUser);
+
+                pPlanNextWeekInfoDB.BegDate = pPlanNextWeekInfo.BegDate;
+                //pPlanNextWeekInfoDB.ProjectClassificationInfoId = pPlanNextWeekInfo.ProjectClassificationInfoId;
+                pPlanNextWeekInfoDB.JobContent = pPlanNextWeekInfo.JobContent;
+
+                //if (pPlanNextWeekInfoDB.BegDate == DateTime.MinValue)
+                //{
+                //    throw new LogicException("自然周日期不能为空");
+                //}
+                //if (pPlanNextWeekInfoDB.ProjectClassificationInfoId == 0)
+                //{
+                //    throw new LogicException("项目分类不能为空");
+                //}
+                //if (string.IsNullOrWhiteSpace(pPlanNextWeekInfoDB.JobContent))
+                //{
+                //    throw new LogicException("工作计划安排内容不能为空");
+                //}
+
+                _businessPlanNextWeek.Edit(pPlanNextWeekInfoDB);
+            }
             return Success();
         }
     }

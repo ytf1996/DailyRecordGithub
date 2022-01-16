@@ -16,7 +16,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         /// <returns></returns>
         public IActionResult List()
         {
-            var list = _businessJobClassification.GetList(null, out int totalCount);
+            var list = _businessJobClassification.GetList(null, out int totalCount,null, "Id");
 
             var result = list.ToList();
 

@@ -2,8 +2,8 @@
 using MyNetCore.Business;
 using MyNetCore.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 
 namespace MyNetCore.Areas.DailyRecord.Controllers
 {
@@ -12,70 +12,111 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         private BusinessWorkDiary _businessWorkDiary = new BusinessWorkDiary();
 
         /// <summary>
-        /// 获取指定日期范围内的工作日志列表
+        /// 获取某一年月的工作日志列表 （若无则新增空的默认行项）
         /// </summary>
+        /// <param name="begDate">一个月的第一天</param>
         /// <returns></returns>
-        public IActionResult List(DateTime begDate, DateTime endDate)
+        public IActionResult List(DateTime begDate)
         {
-            Expression<Func<WorkDiaryInfo, bool>> predicate;
-            var currentUser = GetCurrentUserInfo();
-            if (currentUser != null && currentUser.UserType != UserType.Admin)
+            if(begDate!= new DateTime(begDate.Year, begDate.Month, 1))
             {
-                predicate = x => x.Dt >= begDate && x.Dt <= endDate && x.CreatedById == currentUser.Id;
+                throw new LogicException($"{begDate}不为年月格式，需为每月的第一天");
             }
-            else
-            {
-                predicate = x => x.Dt >= begDate && x.Dt <= endDate;
-            }
-            var list = _businessWorkDiary.GetList(null, out int totalCount, predicate, "Dt");
 
-            var result = list.ToList();
+            var currentUser = GetCurrentUserInfo();
+            if (currentUser == null)
+            {
+                throw new Exception("用户未登录");
+            }
+
+            var beflist = _businessWorkDiary.GetList(null, out int beftotalCount, x => x.Dt >= begDate && x.Dt <= begDate.AddMonths(1).AddDays(-1) && x.CreatedById == currentUser.Id, "Dt");
+
+            var befesult = beflist.ToList();
+
+            _businessWorkDiary.AddDefaultItemWhenNotexist(befesult, begDate);//检查并新增空默认行项
+
+            var aftlist = _businessWorkDiary.GetList(null, out int afttotalCount, x => x.Dt >= begDate && x.Dt <= begDate.AddMonths(1).AddDays(-1) && x.CreatedById == currentUser.Id, "Dt");
+
+            var aftresult = aftlist.ToList();
+
+            return Success(data: aftresult);
+        }
+
+
+        /// <summary>
+        /// 该方法不用于新增空的默认的日志周报列表   （暂设定管理员可以修改，但不能新增），因为普通用户是使用创建人作为筛选条件的，否则需要添加字段 保存该日志是为谁创建的
+        /// </summary>
+        /// <param name="begDate"></param>
+        /// <returns></returns>
+        public IActionResult List_ShowAll_ForAdministrator(DateTime begDate)
+        {
+            if (begDate != new DateTime(begDate.Year, begDate.Month, 1))
+            {
+                throw new LogicException($"{begDate}不为年月格式，需为每月的第一天");
+            }
+
+            var currentUser = GetCurrentUserInfo();
+            if (currentUser == null)
+            {
+                throw new Exception("用户未登录");
+            }
+            if (!currentUser.IsAdmin)
+            {
+                throw new Exception("您无此操作权限");
+            }
+
+            var list = _businessWorkDiary.GetList(null, out int totalCount, x => x.Dt >= begDate && x.Dt <= begDate.AddMonths(1).AddDays(-1));
+
+            var result = list.OrderBy(x => x.CreatedById).ThenBy(x => x.Dt).ToList();
 
             return Success(data: result);
         }
 
+
         /// <summary>
-        /// 添加工作日志
+        /// 日期星期不允许人工改动
         /// </summary>
         /// <param name="workDiaryInfo"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public IActionResult Add([FromBody] WorkDiaryInfo workDiaryInfo)
+        private void EditInner(WorkDiaryInfo workDiaryInfo, Users currentUser)
         {
-            if (workDiaryInfo.Dt == DateTime.MinValue)
+            var workDiaryInfoDB = _businessWorkDiary.GetById(workDiaryInfo.Id);
+            if (workDiaryInfoDB == null)
             {
-                throw new LogicException("日期不能为空");
-            }
-            if (workDiaryInfo.WhatDay > 7 || workDiaryInfo.WhatDay < 1)
-            {
-                throw new LogicException("星期必须在1-7之间");
+                throw new LogicException($"不存在主键id为{workDiaryInfo.Id}的日志周报明细记录");
             }
 
-            //考虑请假填写的情况
+            if (!currentUser.IsAdmin && workDiaryInfoDB.CreatedById != currentUser.Id)
+            {
+                throw new Exception("非管理员没有权限修改他人的记录");
+            }
 
-            //if (workDiaryInfo.JobClassificationInfoId == null)
-            //{
-            //    throw new LogicException("工作分类不能为空");
-            //}
-            //if (string.IsNullOrWhiteSpace(workDiaryInfo.JobContent))
-            //{
-            //    throw new LogicException("工作内容不能为空");
-            //}
+            workDiaryInfoDB.WhetherOnBusinessTrip = workDiaryInfo.WhetherOnBusinessTrip;
+            workDiaryInfoDB.TravelSite = workDiaryInfo.TravelSite;
+            workDiaryInfoDB.JobClassificationInfoId = workDiaryInfo.JobClassificationInfoId;
+            workDiaryInfoDB.JobContent = workDiaryInfo.JobContent;
+            workDiaryInfoDB.BegWorkTime = workDiaryInfo.BegWorkTime;
+            workDiaryInfoDB.EndWorkTime = workDiaryInfo.EndWorkTime;
+            workDiaryInfoDB.NormalWorkHour = workDiaryInfo.NormalWorkHour;
+            workDiaryInfoDB.ExtraWorkHour = workDiaryInfo.ExtraWorkHour;
+            workDiaryInfoDB.SubtotalWorkHour = (workDiaryInfoDB.NormalWorkHour ?? 0) + (workDiaryInfoDB.ExtraWorkHour ?? 0);
+            workDiaryInfoDB.Remark = workDiaryInfo.Remark;
 
-            _businessWorkDiary.Add(workDiaryInfo);
-            return Success();
+            if ((workDiaryInfoDB.BegWorkTime == null && workDiaryInfoDB.EndWorkTime != null) || (workDiaryInfoDB.BegWorkTime != null && workDiaryInfoDB.EndWorkTime == null))
+            {
+                throw new LogicException("请填写完整上下班时间或均不填写");
+            }
+            if (!(workDiaryInfoDB.Dt <= workDiaryInfoDB.BegWorkTime && workDiaryInfoDB.BegWorkTime < workDiaryInfoDB.EndWorkTime && workDiaryInfoDB.EndWorkTime <= workDiaryInfoDB.Dt.AddDays(1)))
+            {
+                throw new LogicException("上下班时间应在当天之内，请重新填写");
+            }
+            if (workDiaryInfoDB.SubtotalWorkHour > 24)
+            {
+                throw new LogicException($"日工作总时长{workDiaryInfoDB.SubtotalWorkHour}大于24小时，请重新填写");
+            }
+
+            _businessWorkDiary.Edit(workDiaryInfoDB);
         }
 
-        /// <summary>
-        /// 获取单条工作日志
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public IActionResult Get(int id)
-        {
-            var workDiaryInfo = _businessWorkDiary.GetById(id);
-            return Success(data: workDiaryInfo);
-        }
 
         /// <summary>
         /// 修改工作日志
@@ -85,42 +126,34 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         [HttpPut]
         public IActionResult Edit([FromBody] WorkDiaryInfo workDiaryInfo)
         {
-            if (workDiaryInfo.Dt == DateTime.MinValue)
+            var currentUser = GetCurrentUserInfo();
+            if (currentUser == null)
             {
-                throw new LogicException("日期不能为空");
+                throw new Exception("用户未登录");
             }
-            if (workDiaryInfo.WhatDay > 7 || workDiaryInfo.WhatDay < 1)
-            {
-                throw new LogicException("星期必须在1-7之间");
-            }
-
-            var workDiaryInfoDB = _businessWorkDiary.GetById(workDiaryInfo.Id);
-            workDiaryInfoDB.Dt = workDiaryInfo.Dt;
-            workDiaryInfoDB.WhatDay = workDiaryInfo.WhatDay;
-            workDiaryInfoDB.WhetherOnBusinessTrip = workDiaryInfo.WhetherOnBusinessTrip;
-            workDiaryInfoDB.TravelSite = workDiaryInfo.TravelSite;
-            workDiaryInfoDB.JobClassificationInfoId = workDiaryInfo.JobClassificationInfoId;
-            workDiaryInfoDB.JobContent = workDiaryInfo.JobContent;
-            workDiaryInfoDB.BegWorkTime = workDiaryInfo.BegWorkTime;
-            workDiaryInfoDB.EndWorkTime = workDiaryInfo.EndWorkTime;
-            workDiaryInfoDB.NormalWorkHour = workDiaryInfo.NormalWorkHour;
-            workDiaryInfoDB.ExtraWorkHour = workDiaryInfo.ExtraWorkHour;
-            workDiaryInfoDB.SubtotalWorkHour = workDiaryInfo.SubtotalWorkHour;
-            workDiaryInfoDB.Remark = workDiaryInfo.Remark;
-
-            _businessWorkDiary.Edit(workDiaryInfoDB);
+            EditInner(workDiaryInfo, currentUser);
             return Success();
         }
 
+
         /// <summary>
-        /// 删除工作日志
+        /// 批量修改工作日志
         /// </summary>
         /// <param name="workDiaryInfo"></param>
         /// <returns></returns>
-        [HttpDelete]
-        public IActionResult Delete([FromRoute] int id)
+        [HttpPut]
+        public IActionResult Save([FromBody] List<WorkDiaryInfo> workDiaryInfoList)
         {
-            _businessWorkDiary.DeleteById(id);
+            var currentUser = GetCurrentUserInfo();
+            if (currentUser == null)
+            {
+                throw new Exception("用户未登录");
+            }
+
+            foreach (var workDiaryInfo in workDiaryInfoList)
+            {
+                EditInner(workDiaryInfo, currentUser);
+            }
             return Success();
         }
     }

@@ -18,16 +18,62 @@ namespace MyNetCore.Business
             }
         }
 
-        public override IQueryable<PlanNextWeekInfo> GetList(DataTableParameters param, out int totalCount, Expression<Func<PlanNextWeekInfo, bool>> predicate = null, 
+        public override IQueryable<PlanNextWeekInfo> GetList(DataTableParameters param, out int totalCount, Expression<Func<PlanNextWeekInfo, bool>> predicate = null,
             string orderByExpression = null, bool? isDESC = null, bool needCheckRight = true, bool asNoTracking = true)
         {
             var list = base.GetList(param, out totalCount, predicate, orderByExpression, isDESC, needCheckRight, asNoTracking);
 
             if (list != null)
             {
-                return list.Include(m => m.JobClassificationInfo);
+                return list.Include(m => m.ProjectClassificationInfo);
             }
             return list;
+        }
+
+        //public void AddDefaultItemWhenNotexist(List<PlanNextWeekInfo> list, DateTime beg)
+        //{
+        //    var projectList = new BusinessProjectClassification().GetList(null, out int totalCount).ToList();
+
+        //    foreach (var project in projectList)
+        //    {
+        //        var item = list.Where(x => x.BegDate == beg && x.ProjectClassificationInfoId == project.Id).FirstOrDefault();
+        //        if (item == null)
+        //        {
+        //            item = new PlanNextWeekInfo
+        //            {
+        //                BegDate = beg,
+        //                ProjectClassificationInfoId = project.Id
+        //            };
+        //            Add(item);
+        //        }
+        //    }
+        //}
+
+        public void CheckDate(DateTime begDate)
+        {
+            if (begDate != new DateTime(begDate.Year, begDate.Month, begDate.Day))
+            {
+                throw new LogicException($"{begDate}不为年月日格式");
+            }
+            if (begDate.DayOfWeek != DayOfWeek.Monday)
+            {
+                throw new LogicException($"{begDate}不为自然周的周一");
+            }
+        }
+
+
+        public void CheckRepeat(DateTime begDate, int projectClassificationInfoId, Users currentUser)
+        {
+            var list = GetList(null, out int beftotalCount, x => x.BegDate == begDate && x.ProjectClassificationInfoId == projectClassificationInfoId && x.CreatedById == currentUser.Id);
+
+            var result = list.ToList();
+
+            if (result.Count > 0)
+            {
+                var project = new BusinessProjectClassification().GetList(null, out int totalCount, x => x.Id == projectClassificationInfoId).FirstOrDefault()?.ClassificationName ?? projectClassificationInfoId.ToString();
+
+                throw new Exception($"当前用户已存在 日期{begDate}、项目{project}的记录");
+            }
         }
     }
 }

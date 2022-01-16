@@ -17,35 +17,56 @@ namespace MyNetCore.Models
         /// </summary>
         [Display(Name = "自然周开始日期")]
         [CustomColumn(isRequired: true, laydateType: LaydateType.date)]
-        public virtual DateTime Beg { get; set; }
-
-        ///// <summary>
-        ///// 自然周结束日期
-        ///// </summary>
-        //[Display(Name = "自然周结束日期")]
-        //[CustomColumn(isRequired: true, laydateType: LaydateType.date)]
-        //public virtual DateTime End { get; set; }
+        public virtual DateTime BegDate { get; set; }
 
         /// <summary>
         /// 项目分类信息
         /// </summary>
         [Display(Name = "项目分类信息")]
-        [ForeignKey("JobClassificationInfoId")]
-        public virtual JobClassificationInfo JobClassificationInfo { get; set; }
+        [ForeignKey("ProjectClassificationInfoId")]
+        public virtual ProjectClassificationInfo ProjectClassificationInfo { get; set; }
 
         /// <summary>
         /// 项目分类信息Id
         /// </summary>
         [Display(Name = "项目分类信息Id")]
         [CustomColumn(isRequired: true)]
-        public virtual int JobClassificationInfoId { get; set; }
+        public virtual int ProjectClassificationInfoId { get; set; }
 
         /// <summary>
         /// 工作计划安排
         /// </summary>
         [MaxLength(4000)]
         [Display(Name = "工作计划安排")]
-        [CustomColumn(isRequired: true)]
+       // [CustomColumn(isRequired: true)]
         public virtual string JobContent { get; set; }
     }
+
+
+    public class PlanDto
+    {
+        /// <summary>
+        /// 自然周开始日期（每周一）
+        /// </summary>
+        public virtual DateTime BegDate { get; set; }
+
+        /// <summary>
+        /// 明细项列表
+        /// </summary>
+        public virtual List<PlanItem> ItemList { get; set; }
+    }
+
+    public class PlanItem
+    {
+        /// <summary>
+        /// 项目分类信息Id
+        /// </summary>
+        public virtual int ProjectClassificationInfoId { get; set; }
+
+        /// <summary>
+        /// 工作计划安排
+        /// </summary>
+        public virtual string JobContent { get; set; }
+    }
+
 }
