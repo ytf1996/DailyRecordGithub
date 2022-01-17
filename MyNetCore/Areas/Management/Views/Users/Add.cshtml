@@ -132,6 +132,22 @@
                                     </div>
 
                                     <div class="col-md-6">
+                                        <label class="control-label" for="CounselorProperty">顾问性质</label>
+                                        <select class="form-control select2" id="CounselorProperty" name="CounselorProperty">
+                                            <option value="">/</option>
+                                            <option value="DevelopmentEngineer" )>开发工程师</option>
+                                            <option value="TestEngineer">测试工程师</option>
+                                            <option value="ImplementationEngineer" )>实施工程师</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="ServiceUnit">服务单位</label>
+                                        <input class="form-control" id="ServiceUnit" name="ServiceUnit" type="text" placeholder="服务单位" autocomplete="off" />
+                                        <input type="hidden">
+                                    </div>
+
+                                    <div class="col-md-6">
                                         <label class="control-label" for="UserType">直属上级<a onclick="delLineManager()">删除</a></label>
                                         <select class="form-control select2" id="LineManageId" name="LineManageId" selectEntityName="Users"></select>
                                     </div>

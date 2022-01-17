@@ -18,7 +18,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         /// <returns></returns>
         public IActionResult List(DateTime begDate)
         {
-            if(begDate!= new DateTime(begDate.Year, begDate.Month, 1))
+            if (begDate != new DateTime(begDate.Year, begDate.Month, 1))
             {
                 throw new LogicException($"{begDate}不为年月格式，需为每月的第一天");
             }
@@ -39,7 +39,17 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
 
             var aftresult = aftlist.ToList();
 
-            return Success(data: aftresult);
+            DiaryShowDto rtnDto = new DiaryShowDto();
+
+            rtnDto.DiaryList = aftresult;
+            rtnDto.User = currentUser;
+            rtnDto.NormalWorkHourSummary = aftresult.Sum(x => x.NormalWorkHour ?? 0);
+            rtnDto.ExtraWorkHourSummary = aftresult.Sum(x => x.ExtraWorkHour ?? 0);
+            rtnDto.SubtotalWorkHourSummary = (rtnDto.NormalWorkHourSummary ?? 0) + (rtnDto.ExtraWorkHourSummary);
+            rtnDto.ChargeDayNum = aftresult.Where(x => x.SubtotalWorkHour != null && x.SubtotalWorkHour != 0).Count();
+            rtnDto.ChargeDayNum = aftresult.Where(x => x.SubtotalWorkHour != null && x.SubtotalWorkHour != 0 && (x.WhetherOnBusinessTrip ?? false)).Count();
+
+            return Success(data: rtnDto);
         }
 
 

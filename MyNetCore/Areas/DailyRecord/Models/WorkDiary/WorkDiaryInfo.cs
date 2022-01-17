@@ -102,4 +102,44 @@ namespace MyNetCore.Models
         [Display(Name = "备注")]
         public virtual string Remark { get; set; }
     }
+
+
+
+    public class DiaryShowDto
+    {
+        /// <summary>
+        /// 日志信息列表
+        /// </summary>
+        public List<WorkDiaryInfo> DiaryList { get; set; }
+
+        /// <summary>
+        /// 用户信息
+        /// </summary>
+        public Users User { get; set; }
+
+        /// <summary>
+        /// 正常小时
+        /// </summary>
+        public virtual decimal? NormalWorkHourSummary { get; set; }
+
+        /// <summary>
+        /// 加班工时
+        /// </summary>
+        public virtual decimal? ExtraWorkHourSummary { get; set; }
+
+        /// <summary>
+        /// 合计工作工时
+        /// </summary>
+        public virtual decimal? SubtotalWorkHourSummary { get; set; }
+
+        /// <summary>
+        /// 收费天数
+        /// </summary>
+        public virtual int? ChargeDayNum { get; set; }
+
+        /// <summary>
+        /// 出差天数
+        /// </summary>
+        public virtual int? BusinessTripDayNum { get; set; }
+    }
 }

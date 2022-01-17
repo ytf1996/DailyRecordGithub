@@ -129,6 +129,8 @@ namespace MyNetCore.Areas.Management.Controllers
                          m.Code,
                          m.HeadImage,
                          UserType = m.UserType.GetCustomDescription(),
+                         CounselorProperty = m.CounselorPropertyVal?.GetCustomDescription(),
+                         ServiceUnit = m.ServiceUnit,
                          ChannelId = m.ChannelsName,
                          TerritoryId = GetTerrByTerrId(m.TerritoryId).Name,
                          Gender = m.Gender.GetCustomDescription(),

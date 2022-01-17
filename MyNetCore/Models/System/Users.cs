@@ -178,7 +178,30 @@ namespace MyNetCore.Models
             }
         }
 
+
+        /// <summary>
+        /// 顾问性质
+        /// </summary>
+        [Display(Name = "顾问性质")]
+        public CounselorProperty? CounselorPropertyVal { get; set; }
+
+        /// <summary>
+        /// 服务单位
+        /// </summary>
+        [Display(Name = "服务单位")]
+        public string ServiceUnit { get; set; }
+
+
         #region 非DB
+        public string CounselorPropertyDes
+        {
+            get
+            {
+                if (CounselorPropertyVal == null) return null;
+                return CounselorPropertyVal.GetCustomDescription();
+            }
+        }
+
         /// <summary>
         /// 小组(非DB)
         /// </summary>
@@ -279,25 +302,34 @@ namespace MyNetCore.Models
         /// </summary>
         [Display(Name = "微信小程序用户")]
         WeChatMini = 40,
+    }
 
+
+    public enum CounselorProperty
+    {
         /// <summary>
         /// 开发工程师
         /// </summary>
         [Display(Name = "开发工程师")]
-        DevelopmentEngineer = 50,
+        DevelopmentEngineer = 10,
 
         /// <summary>
         /// 测试工程师
         /// </summary>
         [Display(Name = "测试工程师")]
-        TestEngineer = 60,
+        TestEngineer = 20,
 
         /// <summary>
         /// 实施工程师
         /// </summary>
         [Display(Name = "实施工程师")]
-        ImplementationEngineer = 70
+        ImplementationEngineer = 30
     }
+
+
+
+
+
 
     /// <summary>
     /// 性别

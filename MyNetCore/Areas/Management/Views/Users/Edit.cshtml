@@ -144,9 +144,27 @@
                                             <option value="Normal" @(Model.UserType == UserType.Normal ? "selected='selected'" : "")>普通用户</option>
                                             <option value="WeChatWork" @(Model.UserType == UserType.WeChatWork ? "selected='selected'" : "")>微信企业号用户</option>
                                             <option value="WeChatMP" @(Model.UserType == UserType.WeChatMP ? "selected='selected'" : "")>微信服务号用户</option>
-                                            <option value="WeChatMini"@(Model.UserType == UserType.WeChatMini ? "selected='selected'" : "")>微信小程序用户</option>
+                                            <option value="WeChatMini" @(Model.UserType == UserType.WeChatMini ? "selected='selected'" : "")>微信小程序用户</option>
                                             <option value="Admin" @(Model.UserType == UserType.Admin ? "selected='selected'" : "")>系统管理员</option>
                                         </select>
+                                    </div>
+
+
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="CounselorProperty">顾问性质</label>
+                                        <select class="form-control select2" id="CounselorProperty" name="CounselorProperty">
+                                            <option value="">/</option>
+                                            <option value="DevelopmentEngineer" @(Model.CounselorPropertyVal == CounselorProperty.DevelopmentEngineer ? "selected='selected'" : "")>开发工程师</option>
+                                            <option value="TestEngineer" @(Model.CounselorPropertyVal == CounselorProperty.TestEngineer ? "selected='selected'" : "")>测试工程师</option>
+                                            <option value="ImplementationEngineer" @(Model.CounselorPropertyVal == CounselorProperty.ImplementationEngineer ? "selected='selected'" : "")>实施工程师</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="ServiceUnit">服务单位</label>
+                                        <input class="form-control" id="ServiceUnit" name="ServiceUnit" type="text" placeholder="服务单位" value="@Model.ServiceUnit"
+                                               autocomplete="off" />
+                                        <input type="hidden">
                                     </div>
 
                                     <div class="col-md-6">
