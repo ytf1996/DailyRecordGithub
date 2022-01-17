@@ -56,12 +56,12 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 accessToken = new AccessToken();
                 accessToken.CurrentUserId = user.Id;
                 accessToken.Name = businessAccessToken.GetNewGuid();
-                accessToken.EffectDateTime = DateTime.Now.AddHours(4);
+                accessToken.EffectDateTime = DateTime.Now.AddHours(24);
                 businessAccessToken.Add(accessToken, false);
             }
             else if (DateTime.Now.AddMinutes(10) >= accessToken.EffectDateTime)
             {
-                accessToken.EffectDateTime = DateTime.Now.AddHours(4);
+                accessToken.EffectDateTime = DateTime.Now.AddHours(24);
                 businessAccessToken.Edit(accessToken, false);
                 user.LastLogin = DateTime.Now;
                 user.PassWord = null;
