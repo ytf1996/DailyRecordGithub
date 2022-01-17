@@ -179,7 +179,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 var pPlanNextWeekInfoDB = _businessPlanNextWeek.GetById(id);
                 if (pPlanNextWeekInfoDB == null)
                 {
-                    throw new LogicException($"不存在主键id为{pPlanNextWeekInfoDB.Id}的下周计划记录");
+                    throw new LogicException($"不存在主键id为{id}的下周计划记录");
                 }
                 if (!currentUser.IsAdmin && pPlanNextWeekInfoDB.CreatedById != currentUser.Id)
                 {
