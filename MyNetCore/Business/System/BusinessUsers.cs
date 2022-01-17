@@ -721,7 +721,7 @@ namespace MyNetCore.Business
             model.UpdatedById = currentUser.Id;
             model.Deleted = true;
             model.UpdatedDate = DateTime.Now;
-
+            DB.Entry(model).State = EntityState.Modified;
             DB.SaveChanges();
             DB.Entry(model).State = EntityState.Detached;
         }
