@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -43,6 +44,7 @@ namespace MyNetCore.Models
     }
 
 
+    #region 新增下周计划
     public class PlanDto
     {
         /// <summary>
@@ -68,5 +70,49 @@ namespace MyNetCore.Models
         /// </summary>
         public virtual string JobContent { get; set; }
     }
+    #endregion
 
+
+
+    #region 查询方法返回的Dto
+    public class PlanShowDto
+    {
+        /// <summary>
+        /// 自然周开始日期（每周一）
+        /// </summary>
+        public virtual DateTime BegDate { get; set; }
+
+        /// <summary>
+        /// 项目列表
+        /// </summary>
+        public virtual List<WeeklyProject> WeeklyProjects { get; set; }// = new List<WeeklyProject>();
+
+        /// <summary>
+        /// 项目列表
+        /// </summary>
+        public virtual DataTable WeeklyData { get; set; }
+    }
+
+
+    public class WeeklyProject
+    {
+        /// <summary>
+        /// 项目编号
+        /// </summary>
+        public virtual int ProjectClassificationInfoId { get; set; }
+
+        /// <summary>
+        /// 项目名称
+        /// </summary>
+        public virtual string ClassificationName { get; set; }
+    }
+
+
+    public class CellDto
+    {
+        public virtual int? Id { get; set; }
+
+        public virtual string JobContent { get; set; }
+    }
+    #endregion
 }

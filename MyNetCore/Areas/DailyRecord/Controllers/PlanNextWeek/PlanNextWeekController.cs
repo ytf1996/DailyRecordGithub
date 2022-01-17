@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MesMessagePlat;
+using Microsoft.AspNetCore.Mvc;
 using MyNetCore.Business;
 using MyNetCore.Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 
 namespace MyNetCore.Areas.DailyRecord.Controllers
@@ -10,14 +12,21 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
     public class PlanNextWeekController : DailyRecordBaseWithAuthController
     {
         private BusinessPlanNextWeek _businessPlanNextWeek = new BusinessPlanNextWeek();
+        private BusinessProjectClassification _businessProjectClassification = new BusinessProjectClassification();
+
 
         /// <summary>
         /// 获取自然周开始时间的工作计划安排
         /// </summary>
         /// <returns></returns>
-        public IActionResult List(DateTime begDate)
+        public IActionResult List(DateTime begDate, DateTime endDate)
         {
             _businessPlanNextWeek.CheckDate(begDate);
+            _businessPlanNextWeek.CheckDate(endDate);
+            if (begDate > endDate)
+            {
+                throw new Exception($"开始时间{begDate}大于结束时间{endDate}");
+            }
 
             var currentUser = GetCurrentUserInfo();
             if (currentUser == null)
@@ -25,17 +34,45 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 throw new Exception("用户未登录");
             }
 
-            var beflist = _businessPlanNextWeek.GetList(null, out int beftotalCount, x => x.BegDate == begDate && x.CreatedById == currentUser.Id, "ProjectClassificationInfoId");
+            PlanShowDto rtnDto = new PlanShowDto();
 
-            var befesult = beflist.ToList();
+            var projectList = _businessProjectClassification.GetList(null, out int totalCount, null, "Id");
+            rtnDto.WeeklyProjects = projectList.Select(x => new WeeklyProject
+            {
+                ProjectClassificationInfoId = x.Id,
+                ClassificationName = x.ClassificationName
+            }).ToList();
 
-            //_businessPlanNextWeek.AddDefaultItemWhenNotexist(befesult, begDate);//检查并新增空默认行项
+            DataTable table = new DataTable();
 
-            //var aftlist = _businessPlanNextWeek.GetList(null, out int afttotalCount, x => x.Beg == begDate && x.CreatedById == currentUser.Id, "ProjectClassificationInfoId");
+            DataRow firstDr = table.NewRow();
+            table.Columns.Add("BegDate", typeof(string));
+            firstDr["BegDate"] = "日期";
+            rtnDto.WeeklyProjects.ForEach(x =>
+            {
+                table.Columns.Add(x.ProjectClassificationInfoId.ToString(), typeof(string));
+                firstDr[x.ProjectClassificationInfoId] = x.ClassificationName;
+            });
+            table.Rows.Add(firstDr);
 
-            //var aftresult = aftlist.ToList();
+            var dataList = _businessPlanNextWeek.GetList(null, out int beftotalCount, x => x.BegDate >= begDate && x.BegDate <= endDate && x.CreatedById == currentUser.Id).ToList();
 
-            return Success(data: befesult);
+            for (var dt = begDate; dt <= endDate; dt = dt.AddDays(7))
+            {
+                DataRow dr = table.NewRow();
+                dr["BegDate"] = dt;
+                rtnDto.WeeklyProjects.ForEach(project =>
+                {
+                    var pPlanNextWeekInfo = dataList.Where(x => x.ProjectClassificationInfoId == project.ProjectClassificationInfoId && x.BegDate == dt).FirstOrDefault();
+
+                    dr[project.ProjectClassificationInfoId] = new CellDto { Id = pPlanNextWeekInfo?.Id, JobContent = pPlanNextWeekInfo?.JobContent };
+                });
+                table.Rows.Add(dr);
+            }
+
+            rtnDto.WeeklyData = table;
+
+            return Success(data: rtnDto.ToJsonString());
         }
 
 

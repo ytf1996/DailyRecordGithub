@@ -49,15 +49,15 @@ namespace MyNetCore.Business
         //    }
         //}
 
-        public void CheckDate(DateTime begDate)
+        public void CheckDate(DateTime date)
         {
-            if (begDate != new DateTime(begDate.Year, begDate.Month, begDate.Day))
+            if (date != new DateTime(date.Year, date.Month, date.Day))
             {
-                throw new LogicException($"{begDate}不为年月日格式");
+                throw new LogicException($"{date}不为年月日格式");
             }
-            if (begDate.DayOfWeek != DayOfWeek.Monday)
+            if (date.DayOfWeek != DayOfWeek.Monday)
             {
-                throw new LogicException($"{begDate}不为自然周的周一");
+                throw new LogicException($"{date}不为自然周的周一");
             }
         }
 
