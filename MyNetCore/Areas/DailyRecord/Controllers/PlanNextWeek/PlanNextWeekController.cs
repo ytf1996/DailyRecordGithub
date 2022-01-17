@@ -158,5 +158,38 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
             }
             return Success();
         }
+
+
+        /// <summary>
+        /// 删除工作计划安排
+        /// </summary>
+        /// <param name="pPlanNextWeekInfo"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        public IActionResult Delete([FromBody] List<int> idList)
+        {
+            var currentUser = GetCurrentUserInfo();
+            if (currentUser == null)
+            {
+                throw new Exception("用户未登录");
+            }
+
+            foreach (var id in idList)
+            {
+                var pPlanNextWeekInfoDB = _businessPlanNextWeek.GetById(id);
+                if (pPlanNextWeekInfoDB == null)
+                {
+                    throw new LogicException($"不存在主键id为{pPlanNextWeekInfoDB.Id}的下周计划记录");
+                }
+                if (!currentUser.IsAdmin && pPlanNextWeekInfoDB.CreatedById != currentUser.Id)
+                {
+                    throw new Exception("非管理员没有权限删除他人的记录");
+                }
+
+                _businessPlanNextWeek.Delete(pPlanNextWeekInfoDB);
+            }
+
+            return Success();
+        }
     }
 }
