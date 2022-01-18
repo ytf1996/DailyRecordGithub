@@ -47,16 +47,17 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
 
             DataRow firstDr = table.NewRow();
             table.Columns.Add("BegDate", typeof(string));
-            firstDr["BegDate"] = "日期";
+            //firstDr["BegDate"] = null;
             rtnDto.WeeklyProjects.ForEach(x =>
             {
                 table.Columns.Add(x.ProjectClassificationInfoId.ToString(), typeof(string));
-                firstDr[x.ProjectClassificationInfoId.ToString()] = x.ClassificationName;
+                //firstDr[x.ProjectClassificationInfoId.ToString()] = x.ClassificationName;
             });
-            table.Rows.Add(firstDr);
+            //table.Rows.Add(firstDr);
 
             var dataList = _businessPlanNextWeek.GetList(null, out int beftotalCount, x => x.BegDate >= begDate && x.BegDate <= endDate && x.CreatedById == currentUser.Id).ToList();
 
+            //string 
             for (var dt = begDate; dt <= endDate; dt = dt.AddDays(1))
             {
                 var dataList_dt = dataList.Where(x => x.BegDate == dt).ToList();
@@ -71,7 +72,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 });
                 table.Rows.Add(dr);
             }
-
+             
             rtnDto.WeeklyData = table;
 
             return Success(data: rtnDto.ToJsonString());
