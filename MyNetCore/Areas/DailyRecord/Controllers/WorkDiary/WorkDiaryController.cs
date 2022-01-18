@@ -11,6 +11,16 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
     {
         private BusinessWorkDiary _businessWorkDiary = new BusinessWorkDiary();
 
+        public IActionResult QueryCurrentUserInfo()
+        {
+            var currentUser = GetCurrentUserInfo();
+            if (currentUser == null)
+            {
+                throw new Exception("用户未登录");
+            }
+            return Success(data: currentUser);
+        }
+
         /// <summary>
         /// 获取某一年月的工作日志列表 （若无则新增空的默认行项）
         /// </summary>
@@ -42,7 +52,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
             DiaryShowDto rtnDto = new DiaryShowDto();
 
             rtnDto.DiaryList = aftresult;
-            rtnDto.User = currentUser;
+            rtnDto.User = currentUser; //待注释掉
             rtnDto.NormalWorkHourSummary = aftresult.Sum(x => x.NormalWorkHour ?? 0);
             rtnDto.ExtraWorkHourSummary = aftresult.Sum(x => x.ExtraWorkHour ?? 0);
             rtnDto.SubtotalWorkHourSummary = (rtnDto.NormalWorkHourSummary ?? 0) + (rtnDto.ExtraWorkHourSummary);
