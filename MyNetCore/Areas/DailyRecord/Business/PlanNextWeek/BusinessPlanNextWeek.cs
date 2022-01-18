@@ -55,10 +55,10 @@ namespace MyNetCore.Business
             {
                 throw new LogicException($"{date}不为年月日格式");
             }
-            if (date.DayOfWeek != DayOfWeek.Monday)
-            {
-                throw new LogicException($"{date}不为自然周的周一");
-            }
+            //if (date.DayOfWeek != DayOfWeek.Monday)
+            //{
+            //    throw new LogicException($"{date}不为自然周的周一");
+            //}
         }
 
 

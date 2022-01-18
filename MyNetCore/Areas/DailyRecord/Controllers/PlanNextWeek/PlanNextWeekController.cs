@@ -57,13 +57,15 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
 
             var dataList = _businessPlanNextWeek.GetList(null, out int beftotalCount, x => x.BegDate >= begDate && x.BegDate <= endDate && x.CreatedById == currentUser.Id).ToList();
 
-            for (var dt = begDate; dt <= endDate; dt = dt.AddDays(7))
+            for (var dt = begDate; dt <= endDate; dt = dt.AddDays(1))
             {
+                var dataList_dt = dataList.Where(x => x.BegDate == dt).ToList();
+                if (dataList_dt.Count == 0) continue;
                 DataRow dr = table.NewRow();
                 dr["BegDate"] = dt;
                 rtnDto.WeeklyProjects.ForEach(project =>
                 {
-                    var pPlanNextWeekInfo = dataList.Where(x => x.ProjectClassificationInfoId == project.ProjectClassificationInfoId && x.BegDate == dt).FirstOrDefault();
+                    var pPlanNextWeekInfo = dataList_dt.Where(x => x.ProjectClassificationInfoId == project.ProjectClassificationInfoId).FirstOrDefault();
 
                     dr[project.ProjectClassificationInfoId] = new CellDto { Id = pPlanNextWeekInfo?.Id, JobContent = pPlanNextWeekInfo?.JobContent };
                 });
