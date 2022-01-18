@@ -99,7 +99,7 @@ namespace MyNetCore.Models
         /// <summary>
         /// 项目编号
         /// </summary>
-        public virtual int ProjectClassificationInfoId { get; set; }
+        public virtual string ProjectClassificationInfoId { get; set; }
 
         /// <summary>
         /// 项目名称
