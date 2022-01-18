@@ -39,7 +39,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
             var projectList = _businessProjectClassification.GetList(null, out int totalCount, null, "Id");
             rtnDto.WeeklyProjects = projectList.Select(x => new WeeklyProject
             {
-                ProjectClassificationInfoId = x.Id,
+                ProjectClassificationInfoId = x.Id.ToString(),
                 ClassificationName = x.ClassificationName
             }).ToList();
 
@@ -65,7 +65,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 dr["BegDate"] = dt;
                 rtnDto.WeeklyProjects.ForEach(project =>
                 {
-                    var pPlanNextWeekInfo = dataList_dt.Where(x => x.ProjectClassificationInfoId == project.ProjectClassificationInfoId).FirstOrDefault();
+                    var pPlanNextWeekInfo = dataList_dt.Where(x => x.ProjectClassificationInfoId.ToString() == project.ProjectClassificationInfoId.ToString()).FirstOrDefault();
 
                     dr[project.ProjectClassificationInfoId.ToString()] = new CellDto { Id = pPlanNextWeekInfo?.Id, JobContent = pPlanNextWeekInfo?.JobContent };
                 });
