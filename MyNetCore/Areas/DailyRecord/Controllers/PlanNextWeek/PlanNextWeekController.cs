@@ -51,7 +51,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
             rtnDto.WeeklyProjects.ForEach(x =>
             {
                 table.Columns.Add(x.ProjectClassificationInfoId.ToString(), typeof(string));
-                firstDr[x.ProjectClassificationInfoId] = x.ClassificationName;
+                firstDr[x.ProjectClassificationInfoId.ToString()] = x.ClassificationName;
             });
             table.Rows.Add(firstDr);
 
@@ -67,7 +67,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 {
                     var pPlanNextWeekInfo = dataList_dt.Where(x => x.ProjectClassificationInfoId == project.ProjectClassificationInfoId).FirstOrDefault();
 
-                    dr[project.ProjectClassificationInfoId] = new CellDto { Id = pPlanNextWeekInfo?.Id, JobContent = pPlanNextWeekInfo?.JobContent };
+                    dr[project.ProjectClassificationInfoId.ToString()] = new CellDto { Id = pPlanNextWeekInfo?.Id, JobContent = pPlanNextWeekInfo?.JobContent };
                 });
                 table.Rows.Add(dr);
             }
