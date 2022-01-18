@@ -28,10 +28,11 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         /// <returns></returns>
         public IActionResult List(DateTime begDate)
         {
-            if (begDate != new DateTime(begDate.Year, begDate.Month, 1))
-            {
-                throw new LogicException($"{begDate}不为年月格式，需为每月的第一天");
-            }
+            begDate = new DateTime(begDate.Year, begDate.Month, 1)
+            //if (begDate != new DateTime(begDate.Year, begDate.Month, 1))
+            //{
+            //    throw new LogicException($"{begDate}不为年月格式，需为每月的第一天");
+            //}
 
             var currentUser = GetCurrentUserInfo();
             if (currentUser == null)
