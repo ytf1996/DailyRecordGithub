@@ -112,7 +112,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         /// <param name="pPlanNextWeekInfo"></param>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult Add([FromBody] PlanDto planDto)
+        public IActionResult Add(PlanDto planDto)
         {
             var currentUser = GetCurrentUserInfo();
             if (currentUser == null)
@@ -124,7 +124,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
 
             foreach (var item in planDto.ItemList)
             {
-                if (item.ProjectClassificationInfoId == 0)
+                if (string.IsNullOrEmpty(item.ProjectClassificationInfoId))
                 {
                     throw new LogicException("项目分类不能为空");
                 }
@@ -133,11 +133,11 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                     throw new LogicException("工作计划安排内容不能为空");
                 }
 
-                _businessPlanNextWeek.CheckRepeat(planDto.BegDate, item.ProjectClassificationInfoId, currentUser);
+                _businessPlanNextWeek.CheckRepeat(planDto.BegDate, Convert.ToInt32(item.ProjectClassificationInfoId), currentUser);
                 var pPlanNextWeekInfo = new PlanNextWeekInfo
                 {
                     BegDate = planDto.BegDate,
-                    ProjectClassificationInfoId = item.ProjectClassificationInfoId,
+                    ProjectClassificationInfoId =Convert.ToInt32(item.ProjectClassificationInfoId),
                     JobContent = item.JobContent
                 };
 
@@ -153,7 +153,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         /// <param name="pPlanNextWeekInfo"></param>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult Edit([FromBody] List<PlanNextWeekInfo> pPlanNextWeekInfoList)
+        public IActionResult Edit(List<PlanNextWeekInfo> pPlanNextWeekInfoList)
         {
             var currentUser = GetCurrentUserInfo();
             if (currentUser == null)
@@ -206,7 +206,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         /// <param name="pPlanNextWeekInfo"></param>
         /// <returns></returns>
         [HttpDelete]
-        public IActionResult Delete([FromBody] List<int> idList)
+        public IActionResult Delete(List<int> idList)
         {
             var currentUser = GetCurrentUserInfo();
             if (currentUser == null)

@@ -24,7 +24,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         }
 
         [HttpPost]
-        public IActionResult LogInDailyRecord([FromBody] LoginDto input)
+        public IActionResult LogInDailyRecord(LoginDto input)
         {
             BusinessUsers businessUsers = new BusinessUsers();
 

@@ -145,7 +145,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         /// <param name="workDiaryInfo"></param>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult Edit([FromBody] WorkDiaryInfo workDiaryInfo)
+        public IActionResult Edit(WorkDiaryInfo workDiaryInfo)
         {
             var currentUser = GetCurrentUserInfo();
             if (currentUser == null)
@@ -163,7 +163,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         /// <param name="workDiaryInfo"></param>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult Save([FromBody] List<WorkDiaryInfo> workDiaryInfoList)
+        public IActionResult Save(List<WorkDiaryInfo> workDiaryInfoList)
         {
             var currentUser = GetCurrentUserInfo();
             if (currentUser == null)

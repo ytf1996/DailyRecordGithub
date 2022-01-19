@@ -63,7 +63,7 @@ namespace MyNetCore.Models
         /// <summary>
         /// 项目分类信息Id
         /// </summary>
-        public virtual int ProjectClassificationInfoId { get; set; }
+        public virtual string ProjectClassificationInfoId { get; set; }
 
         /// <summary>
         /// 工作计划安排
