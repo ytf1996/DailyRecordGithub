@@ -74,7 +74,9 @@ namespace MyNetCore.Business
                 {
                     currentUser = apiUserModel.CurrentUser;
                     apiUserModel.EffectDateTime = DateTime.Now.AddMinutes(ApiUserEffectMinutes);
-                    DB.SaveChanges();
+                    BusinessAccessToken businessAccessToken = new BusinessAccessToken();
+                    businessAccessToken.Edit(apiUserModel, false);
+                    //DB.SaveChanges();
                     AppContextMy.Current?.Session.SetObjectAsJson("CurrentUser", currentUser);
                     return currentUser;
                 }
