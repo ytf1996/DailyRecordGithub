@@ -28,7 +28,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         /// <returns></returns>
         public IActionResult List(DateTime begDate)
         {
-            begDate = new DateTime(begDate.Year, begDate.Month, 1)
+            begDate = new DateTime(begDate.Year, begDate.Month, 1);
             //if (begDate != new DateTime(begDate.Year, begDate.Month, 1))
             //{
             //    throw new LogicException($"{begDate}不为年月格式，需为每月的第一天");
@@ -144,7 +144,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         /// </summary>
         /// <param name="workDiaryInfo"></param>
         /// <returns></returns>
-        [HttpPut]
+        [HttpPost]
         public IActionResult Edit([FromBody] WorkDiaryInfo workDiaryInfo)
         {
             var currentUser = GetCurrentUserInfo();
@@ -162,7 +162,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         /// </summary>
         /// <param name="workDiaryInfo"></param>
         /// <returns></returns>
-        [HttpPut]
+        [HttpPost]
         public IActionResult Save([FromBody] List<WorkDiaryInfo> workDiaryInfoList)
         {
             var currentUser = GetCurrentUserInfo();

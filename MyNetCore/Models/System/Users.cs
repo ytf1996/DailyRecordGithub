@@ -193,6 +193,7 @@ namespace MyNetCore.Models
 
 
         #region 非DB
+        [NotMapped]
         public string CounselorPropertyDes
         {
             get

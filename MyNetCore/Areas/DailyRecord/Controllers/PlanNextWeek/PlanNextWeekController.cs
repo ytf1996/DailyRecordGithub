@@ -152,7 +152,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         /// </summary>
         /// <param name="pPlanNextWeekInfo"></param>
         /// <returns></returns>
-        [HttpPut]
+        [HttpPost]
         public IActionResult Edit([FromBody] List<PlanNextWeekInfo> pPlanNextWeekInfoList)
         {
             var currentUser = GetCurrentUserInfo();
