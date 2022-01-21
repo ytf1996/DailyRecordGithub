@@ -68,7 +68,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 {
                     var pPlanNextWeekInfo = dataList_dt.Where(x => x.ProjectClassificationInfoId.ToString() == project.ProjectClassificationInfoId.ToString()).FirstOrDefault();
 
-                    dr[project.ProjectClassificationInfoId.ToString()] = new CellDto { Id = pPlanNextWeekInfo?.Id, JobContent = pPlanNextWeekInfo?.JobContent };
+                    dr[project.ProjectClassificationInfoId.ToString()] = new CellDto { Id = pPlanNextWeekInfo?.Id, JobContent = pPlanNextWeekInfo?.JobContent }.ToJsonString();
                 });
                 table.Rows.Add(dr);
             }
