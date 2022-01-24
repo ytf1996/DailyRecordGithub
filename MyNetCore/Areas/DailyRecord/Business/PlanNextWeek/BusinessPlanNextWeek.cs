@@ -49,30 +49,38 @@ namespace MyNetCore.Business
         //    }
         //}
 
-        public void CheckDate(DateTime date)
+        //public void CheckDate(DateTime date)
+        //{
+        //    if (date != new DateTime(date.Year, date.Month, date.Day))
+        //    {
+        //        throw new LogicException($"{date}不为年月日格式");
+        //    }
+        //    if (date.DayOfWeek != DayOfWeek.Monday)
+        //    {
+        //        throw new LogicException($"{date}不为自然周的周一");
+        //    }
+        //}
+
+
+        public void CheckRepeat(DateTime begDate, int projectClassificationInfoId, Users currentUser, bool isUpdate=false, int updatedId=0)
         {
-            if (date != new DateTime(date.Year, date.Month, date.Day))
+            var dayOfWeek = begDate.DayOfWeek; //新增日期的所属星期几    0-6
+            var dayBegOfWeek = begDate.AddDays(-(int)dayOfWeek); //获取该日期所属星期的第一天
+            var dayEndOfWeek = begDate.AddDays(6 - (int)dayOfWeek); //获取该日期所属星期的第七天
+
+            var list = GetList(null, out int beftotalCount, x => x.BegDate >= dayBegOfWeek && x.BegDate <= dayEndOfWeek && x.ProjectClassificationInfoId == projectClassificationInfoId && x.CreatedById == currentUser.Id);
+
+            if (isUpdate)
             {
-                throw new LogicException($"{date}不为年月日格式");
+                list = list.Where(x => x.Id != updatedId);
             }
-            //if (date.DayOfWeek != DayOfWeek.Monday)
-            //{
-            //    throw new LogicException($"{date}不为自然周的周一");
-            //}
-        }
-
-
-        public void CheckRepeat(DateTime begDate, int projectClassificationInfoId, Users currentUser)
-        {
-            var list = GetList(null, out int beftotalCount, x => x.BegDate == begDate && x.ProjectClassificationInfoId == projectClassificationInfoId && x.CreatedById == currentUser.Id);
-
             var result = list.ToList();
 
             if (result.Count > 0)
             {
                 var project = new BusinessProjectClassification().GetList(null, out int totalCount, x => x.Id == projectClassificationInfoId).FirstOrDefault()?.ClassificationName ?? projectClassificationInfoId.ToString();
 
-                throw new Exception($"当前用户已存在 日期{begDate}、项目{project}的记录");
+                throw new Exception($"当前用户已存在 日期{begDate}所属星期、项目{project}的记录");
             }
         }
     }

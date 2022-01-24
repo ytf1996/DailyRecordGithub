@@ -21,8 +21,10 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         /// <returns></returns>
         public IActionResult List(DateTime begDate, DateTime endDate)
         {
-            _businessPlanNextWeek.CheckDate(begDate);
-            _businessPlanNextWeek.CheckDate(endDate);
+            begDate = new DateTime(begDate.Year, begDate.Month, begDate.Day);
+            endDate = new DateTime(endDate.Year, endDate.Month, endDate.Day);
+            //_businessPlanNextWeek.CheckDate(begDate);
+            //_businessPlanNextWeek.CheckDate(endDate);
             if (begDate > endDate)
             {
                 throw new Exception($"开始时间{begDate}大于结束时间{endDate}");
@@ -57,7 +59,6 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
 
             var dataList = _businessPlanNextWeek.GetList(null, out int beftotalCount, x => x.BegDate >= begDate && x.BegDate <= endDate && x.CreatedById == currentUser.Id).ToList();
 
-            //string 
             for (var dt = begDate; dt <= endDate; dt = dt.AddDays(1))
             {
                 var dataList_dt = dataList.Where(x => x.BegDate == dt).ToList();
@@ -86,7 +87,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         /// <returns></returns>
         public IActionResult List_ShowAll_ForAdministrator(DateTime begDate)
         {
-            _businessPlanNextWeek.CheckDate(begDate);
+            //_businessPlanNextWeek.CheckDate(begDate);
 
             var currentUser = GetCurrentUserInfo();
             if (currentUser == null)
@@ -120,7 +121,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 throw new Exception("用户未登录");
             }
 
-            _businessPlanNextWeek.CheckDate(planDto.BegDate);
+            //_businessPlanNextWeek.CheckDate(planDto.BegDate);
 
             foreach (var item in planDto.ItemList)
             {
@@ -132,7 +133,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 {
                     throw new LogicException("工作计划安排内容不能为空");
                 }
-
+                planDto.BegDate= new DateTime(planDto.BegDate.Year, planDto.BegDate.Month, planDto.BegDate.Day);
                 _businessPlanNextWeek.CheckRepeat(planDto.BegDate, Convert.ToInt32(item.ProjectClassificationInfoId), currentUser);
                 var pPlanNextWeekInfo = new PlanNextWeekInfo
                 {
@@ -172,10 +173,10 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 {
                     throw new Exception("非管理员没有权限修改他人的记录");
                 }
+                pPlanNextWeekInfo.BegDate = new DateTime(pPlanNextWeekInfo.BegDate.Year, pPlanNextWeekInfo.BegDate.Month, pPlanNextWeekInfo.BegDate.Day);
+                //_businessPlanNextWeek.CheckDate(pPlanNextWeekInfo.BegDate);
 
-                _businessPlanNextWeek.CheckDate(pPlanNextWeekInfo.BegDate);
-
-                _businessPlanNextWeek.CheckRepeat(pPlanNextWeekInfo.BegDate, pPlanNextWeekInfo.ProjectClassificationInfoId, currentUser);
+                _businessPlanNextWeek.CheckRepeat(pPlanNextWeekInfo.BegDate, pPlanNextWeekInfo.ProjectClassificationInfoId, currentUser,isUpdate:true, pPlanNextWeekInfo.Id);
 
                 pPlanNextWeekInfoDB.BegDate = pPlanNextWeekInfo.BegDate;
                 //pPlanNextWeekInfoDB.ProjectClassificationInfoId = pPlanNextWeekInfo.ProjectClassificationInfoId;
