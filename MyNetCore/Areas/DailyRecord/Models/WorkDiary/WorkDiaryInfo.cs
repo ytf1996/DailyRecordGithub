@@ -227,11 +227,11 @@ namespace MyNetCore.Models
     }
 
 
-    public enum WorkOrHoliday
-    {
-        WorkDay = 1,
+    //public enum WorkOrHoliday
+    //{
+    //    WorkDay = 1,
 
-        Holiday = 2
-    }
+    //    Holiday = 2
+    //}
     #endregion
 }

@@ -49,11 +49,14 @@ namespace MyNetCore.Business
                         Dt = dt,
                         WhatDay = (int)dt.DayOfWeek,
                         WhetherOnBusinessTrip = false,
-                        BegWorkTime = dt.AddHours(8),
-                        EndWorkTime = dt.AddHours(17),
                         NormalWorkHour = isWorkDay ? 8 : 0,
                         ExtraWorkHour = 0
                     };
+                    if (isWorkDay)
+                    {
+                        item.BegWorkTime = dt.AddHours(8);
+                        item.EndWorkTime = dt.AddHours(17);
+                    }
                     item.SubtotalWorkHour = item.NormalWorkHour + item.ExtraWorkHour;
                     Add(item);
                 }
