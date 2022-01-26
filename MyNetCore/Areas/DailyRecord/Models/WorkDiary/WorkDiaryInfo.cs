@@ -164,4 +164,74 @@ namespace MyNetCore.Models
         /// </summary>
         public virtual int? BusinessTripDayNum { get; set; }
     }
+
+    #region 日历 (工作日、节假日、周末)
+    public class Calendar
+    {
+        public string Code { get; set; }
+
+        public string Msg { get; set; }
+
+        public MonthData Data { get; set; }
+    }
+
+    public class MonthData
+    {
+        public List<EachDayInfo>List  { get; set; }
+
+        public int Page { get; set; }
+
+        public int Size { get; set; }
+
+        public int Total { get; set; }
+    }
+
+
+    public class EachDayInfo
+    {
+        public string Year { get; set; }
+
+        public string Month { get; set; }
+
+        public string Date { get; set; }
+
+        public string Yearweek { get; set; }
+
+        public string Yearday { get; set; }
+
+        public string Lunar_year { get; set; }
+
+        public string Lunar_month { get; set; }
+
+        public string Lunar_date { get; set; }
+
+        public string Lunar_yearday { get; set; }
+
+        public string Week { get; set; }
+
+        public string Weekend { get; set; }
+
+        public string Workday { get; set; }  //1是工作日       2是放假
+
+        public string Holiday { get; set; }
+
+        public string Holiday_or { get; set; }
+
+        public string Holiday_overtime { get; set; }
+
+        public string Holiday_today { get; set; }
+
+        public string Holiday_legal { get; set; }
+
+        public string Holiday_recess { get; set; }
+    }
+
+
+    public enum WorkOrHoliday
+    {
+        WorkDay = 1,
+
+        Holiday = 2
+    }
+    #endregion
 }

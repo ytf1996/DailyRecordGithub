@@ -29,6 +29,8 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         public IActionResult List(DateTime begDate)
         {
             begDate = new DateTime(begDate.Year, begDate.Month, 1);
+
+            if (DateTime.Today.AddMonths(3) < begDate) throw new Exception("查询日期最多为当前月往后3个月");
             //if (begDate != new DateTime(begDate.Year, begDate.Month, 1))
             //{
             //    throw new LogicException($"{begDate}不为年月格式，需为每月的第一天");

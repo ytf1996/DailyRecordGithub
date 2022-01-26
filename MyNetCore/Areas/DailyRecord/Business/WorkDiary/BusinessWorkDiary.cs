@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net;
+using System.Text;
 using System.Web;
 using Microsoft.EntityFrameworkCore;
 using MyNetCore.Models;
+using Newtonsoft.Json;
 
 namespace MyNetCore.Business
 {
@@ -33,11 +36,14 @@ namespace MyNetCore.Business
 
         public void AddDefaultItemWhenNotexist(List<WorkDiaryInfo> list, DateTime begDate)
         {
+            var calendarList = GetHoliday(begDate.ToString("yyyyMM"));
             for (var dt = begDate; dt < begDate.AddMonths(1); dt = dt.AddDays(1))
             {
                 var item = list.Where(x => x.Dt == dt).FirstOrDefault();
                 if (item == null)
                 {
+                    var calendarItem = calendarList.Where(x => x.Date == dt.ToString("yyyyMMdd")).FirstOrDefault();
+                    var isWorkDay = calendarItem?.Workday == "1";
                     item = new WorkDiaryInfo
                     {
                         Dt = dt,
@@ -45,12 +51,43 @@ namespace MyNetCore.Business
                         WhetherOnBusinessTrip = false,
                         BegWorkTime = dt.AddHours(8),
                         EndWorkTime = dt.AddHours(17),
-                        NormalWorkHour = 8,
-                        ExtraWorkHour = 0,
-                        SubtotalWorkHour = 8
+                        NormalWorkHour = isWorkDay ? 8 : 0,
+                        ExtraWorkHour = 0
                     };
+                    item.SubtotalWorkHour = item.NormalWorkHour + item.ExtraWorkHour;
                     Add(item);
                 }
+            }
+        }
+
+
+        /// <summary>
+        /// 获取指定年月的 工作日、节假日、周末
+        /// </summary>
+        /// <param name="yyyyMM"></param>
+        private List<EachDayInfo> GetHoliday(string yyyyMM)
+        {
+            List<EachDayInfo> result = null;
+            try
+            {
+                WebClient client = new WebClient();
+                client.Encoding = Encoding.UTF8;
+                var url = $"https://api.apihubs.cn/holiday/get?month={yyyyMM}";
+                var jsondata = client.DownloadString(url);
+
+                var model = JsonConvert.DeserializeObject<Calendar>(jsondata);
+                if (model.Code == "0")
+                {
+                    result = model.Data.List;
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                BusinessLog businessLog = new BusinessLog();
+                businessLog.Error(ex.Message);
+                return result;
             }
         }
     }

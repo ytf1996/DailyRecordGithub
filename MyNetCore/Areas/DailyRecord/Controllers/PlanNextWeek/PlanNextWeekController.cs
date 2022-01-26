@@ -59,7 +59,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
 
             var dataList = _businessPlanNextWeek.GetList(null, out int beftotalCount, x => x.BegDate >= begDate && x.BegDate <= endDate && x.CreatedById == currentUser.Id).ToList();
 
-            for (var dt = begDate; dt <= endDate; dt = dt.AddDays(1))
+            for (var dt = endDate; dt >=begDate ; dt = dt.AddDays(-1))
             {
                 var dataList_dt = dataList.Where(x => x.BegDate == dt).ToList();
                 if (dataList_dt.Count == 0) continue;
