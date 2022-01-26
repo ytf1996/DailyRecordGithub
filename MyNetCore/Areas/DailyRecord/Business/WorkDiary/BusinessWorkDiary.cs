@@ -43,7 +43,11 @@ namespace MyNetCore.Business
                 if (item == null)
                 {
                     var calendarItem = calendarList.Where(x => x.Date == dt.ToString("yyyyMMdd")).FirstOrDefault();
-                    var isWorkDay = calendarItem?.Workday == "1";
+                    dynamic isWorkDay;
+                    if (calendarItem != null)
+                        isWorkDay = calendarItem?.Workday == "1";
+                    else
+                        isWorkDay = dt.DayOfWeek != DayOfWeek.Saturday && dt.DayOfWeek != DayOfWeek.Sunday;
                     item = new WorkDiaryInfo
                     {
                         Dt = dt,
@@ -70,7 +74,7 @@ namespace MyNetCore.Business
         /// <param name="yyyyMM"></param>
         private List<EachDayInfo> GetHoliday(string yyyyMM)
         {
-            List<EachDayInfo> result = null;
+            List<EachDayInfo> result = new List<EachDayInfo>(); ;
             try
             {
                 WebClient client = new WebClient();
