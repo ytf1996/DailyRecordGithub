@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MyNetCore.Business;
 using MyNetCore.Models;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace MyNetCore.Areas.DailyRecord.Controllers
@@ -10,6 +13,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
     public class WorkDiaryController : DailyRecordBaseWithAuthController
     {
         private BusinessWorkDiary _businessWorkDiary = new BusinessWorkDiary();
+        private BusinessUsers _businessUsers = new BusinessUsers();
 
         public IActionResult QueryCurrentUserInfo()
         {
@@ -67,17 +71,14 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
 
 
         /// <summary>
-        /// 该方法不用于新增空的默认的日志周报列表   （暂设定管理员可以修改，但不能新增），因为普通用户是使用创建人作为筛选条件的，否则需要添加字段 保存该日志是为谁创建的
+        /// 按公司+年月导出 所有人员的日报 为excel（管理员专用导出功能）
         /// </summary>
-        /// <param name="begDate"></param>
+        /// <param name="begDate">年月</param>
+        /// <param name="contractedSupplier">公司</param>
         /// <returns></returns>
-        public IActionResult List_ShowAll_ForAdministrator(DateTime begDate)
+        public IActionResult ExportByYearMonth(DateTime begDate, string contractedSupplier)
         {
             begDate = new DateTime(begDate.Year, begDate.Month, 1);
-            //if (begDate != new DateTime(begDate.Year, begDate.Month, 1))
-            //{
-            //    throw new LogicException($"{begDate}不为年月格式，需为每月的第一天");
-            //}
 
             var currentUser = GetCurrentUserInfo();
             if (currentUser == null)
@@ -89,13 +90,56 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 throw new Exception("您无此操作权限");
             }
 
-            var list = _businessWorkDiary.GetList(null, out int totalCount, x => x.Dt >= begDate && x.Dt <= begDate.AddMonths(1).AddDays(-1));
+            var userExpList = _businessUsers.GetList(null, out int userTotalCount, x => x.ContractedSupplier == contractedSupplier && !x.Disabled, "UserOrder", null, false).ToList();
+            var userAccounts = userExpList.Select(x => (int?)x.Id).ToList();
 
-            var result = list.OrderBy(x => x.CreatedById).ThenBy(x => x.Dt).ToList();
+            var allWorkDiaryList = _businessWorkDiary.GetList(null, out int totalCount, x => userAccounts.Contains(x.CreatedById) && x.Dt >= begDate && x.Dt <= begDate.AddMonths(1).AddDays(-1));
+            var hasWorkDiaryAcconts = allWorkDiaryList.Select(x => x.CreatedById).Distinct().ToList();
 
-            return Success(data: result);
+            userExpList = userExpList.Where(x => hasWorkDiaryAcconts.Contains(x.Id)).ToList();
+            userAccounts= userExpList.Select(x => (int?)x.Id).ToList();
+
+            foreach (var user in userAccounts)
+            {
+                var userInfo = userExpList.Where(x => x.Id == user).FirstOrDefault();
+                var curUserWorkDiaryList = allWorkDiaryList.Where(x => x.CreatedById == user).OrderBy(x => x.Dt).ToList();
+
+                NpoiOperation();
+            }
+
+            return Success();  //返回excel
         }
 
+
+        public string NpoiOperation()
+        {
+            string file =AppContext.BaseDirectory+ "日志导出.xlsx";
+
+            return file;
+            IWorkbook workbook;
+            ISheet sheet;
+            using (FileStream stream = new FileStream(file, FileMode.Open, FileAccess.Read))
+            {
+                workbook = new XSSFWorkbook(stream);
+                sheet = workbook.GetSheetAt(0);
+            }
+
+            //using (FileStream stream = new FileStream(file, FileMode.Create, FileAccess.Write))
+            //{
+            //    for (var i = 1; i <= sheet.LastRowNum; i++)
+            //    {
+            //        IRow row = sheet.GetRow(i);
+            //        ICell cell_ordGroup = row.GetCell(4);//获取订单组号列
+
+
+            //            ICell cell_rst = row.CreateCell(10);//生成结果列
+            //            cell_rst.SetCellValue("成功");
+
+            //    }
+            //    workbook.Write(stream);
+            //}
+            workbook.Close();
+        }
 
         /// <summary>
         /// 日期星期不允许人工改动
