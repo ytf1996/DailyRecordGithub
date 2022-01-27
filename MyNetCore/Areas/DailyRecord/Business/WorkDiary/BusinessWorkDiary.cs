@@ -74,7 +74,7 @@ namespace MyNetCore.Business
         /// <param name="yyyyMM"></param>
         private List<EachDayInfo> GetHoliday(string yyyyMM)
         {
-            List<EachDayInfo> result = new List<EachDayInfo>(); ;
+            List<EachDayInfo> result = new List<EachDayInfo>();
             try
             {
                 WebClient client = new WebClient();

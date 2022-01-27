@@ -151,8 +151,8 @@
 
 
                                     <div class="col-md-6">
-                                        <label class="control-label" for="CounselorProperty">顾问性质</label>
-                                        <select class="form-control select2" id="CounselorProperty" name="CounselorProperty">
+                                        <label class="control-label" for="CounselorPropertyVal">顾问性质</label>
+                                        <select class="form-control select2" id="CounselorPropertyVal" name="CounselorPropertyVal">
                                             <option value="">/</option>
                                             <option value="DevelopmentEngineer" @(Model.CounselorPropertyVal == CounselorProperty.DevelopmentEngineer ? "selected='selected'" : "")>开发工程师</option>
                                             <option value="TestEngineer" @(Model.CounselorPropertyVal == CounselorProperty.TestEngineer ? "selected='selected'" : "")>测试工程师</option>
@@ -161,8 +161,29 @@
                                     </div>
 
                                     <div class="col-md-6">
+                                        <label class="control-label" for="ContractedSupplier">签约供应商</label>
+                                        <input class="form-control" id="ContractedSupplier" name="ContractedSupplier" type="text" placeholder="签约供应商" value="@Model.ContractedSupplier"
+                                               autocomplete="off" />
+                                        <input type="hidden">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="Group">组别Project team</label>
+                                        <input class="form-control" id="Group" name="Group" type="text" placeholder="组别Project team" value="@Model.Group"
+                                               autocomplete="off" />
+                                        <input type="hidden">
+                                    </div>
+
+                                    <div class="col-md-6">
                                         <label class="control-label" for="ServiceUnit">服务单位</label>
                                         <input class="form-control" id="ServiceUnit" name="ServiceUnit" type="text" placeholder="服务单位" value="@Model.ServiceUnit"
+                                               autocomplete="off" />
+                                        <input type="hidden">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="UserOrder">人员序号</label>
+                                        <input class="form-control" id="UserOrder" name="UserOrder" type="text" placeholder="人员序号" value="@Model.UserOrder"
                                                autocomplete="off" />
                                         <input type="hidden">
                                     </div>

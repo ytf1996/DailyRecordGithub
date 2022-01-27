@@ -191,6 +191,24 @@ namespace MyNetCore.Models
         [Display(Name = "服务单位")]
         public string ServiceUnit { get; set; }
 
+        /// <summary>
+        /// 签约供应商
+        /// </summary>
+        [Display(Name = "签约供应商")]
+        public string ContractedSupplier { get; set; }
+
+        /// <summary>
+        /// 组别Project team
+        /// </summary>
+        [Display(Name = "组别Project team")]
+        public string Group { get; set; }
+
+        /// <summary>
+        /// 人员序号  （日志周报功能）
+        /// </summary>
+        [Display(Name = "人员序号")]
+        public string UserOrder { get; set; }
+
 
         #region 非DB
         [NotMapped]

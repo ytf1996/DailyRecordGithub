@@ -47,7 +47,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
 
             DataTable table = new DataTable();
 
-            DataRow firstDr = table.NewRow();
+            //DataRow firstDr = table.NewRow();
             table.Columns.Add("BegDate", typeof(string));
             //firstDr["BegDate"] = null;
             rtnDto.WeeklyProjects.ForEach(x =>
@@ -85,7 +85,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         /// </summary>
         /// <param name="begDate"></param>
         /// <returns></returns>
-        public IActionResult List_ShowAll_ForAdministrator(DateTime begDate)
+        public IActionResult List_ShowAll_ForAdministrator(DateTime begDate)           //待定
         {
             //_businessPlanNextWeek.CheckDate(begDate);
 
