@@ -64,8 +64,8 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
             rtnDto.NormalWorkHourSummary = aftresult.Sum(x => x.NormalWorkHour ?? 0);
             rtnDto.ExtraWorkHourSummary = aftresult.Sum(x => x.ExtraWorkHour ?? 0);
             rtnDto.SubtotalWorkHourSummary = Math.Round((((rtnDto.NormalWorkHourSummary ?? 0) + (rtnDto.ExtraWorkHourSummary ?? 0)) / 8), 2);
-            rtnDto.ChargeDayNum = aftresult.Where(x => x.SubtotalWorkDay != null && x.SubtotalWorkDay != 0).Count();
-            rtnDto.BusinessTripDayNum = aftresult.Where(x => x.SubtotalWorkDay != null && x.SubtotalWorkDay != 0 && (x.WhetherOnBusinessTrip ?? false)).Count();
+            rtnDto.ChargeDayNum = aftresult.Where(x => x.SubtotalWorkHour != null && x.SubtotalWorkHour != 0).Count();
+            rtnDto.BusinessTripDayNum = aftresult.Where(x => x.SubtotalWorkHour != null && x.SubtotalWorkHour != 0 && (x.WhetherOnBusinessTrip ?? false)).Count();
 
             return Success(data: rtnDto);
         }
@@ -74,12 +74,12 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         /// <summary>
         /// 按公司+年月导出 所有人员的日报 为excel（管理员专用导出功能）
         /// </summary>
-        /// <param name="begDate">年月</param>
+        /// <param name="yearMonth">年月</param>
         /// <param name="contractedSupplier">公司</param>
         /// <returns></returns>
-        public IActionResult ExportByYearMonth(DateTime begDate, string contractedSupplier)
+        public IActionResult ExportDailyReport(DateTime yearMonth, string contractedSupplier)
         {
-            begDate = new DateTime(begDate.Year, begDate.Month, 1);
+            yearMonth = new DateTime(yearMonth.Year, yearMonth.Month, 1);
 
             var currentUser = GetCurrentUserInfo();
             if (currentUser == null)
@@ -93,13 +93,13 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
 
             var userExpList = _businessUsers.GetList(null, out int userTotalCount, x => x.ContractedSupplier == contractedSupplier && !x.Disabled, "UserOrder", null, false).ToList();
             var userAccounts = userExpList.Select(x => (int?)x.Id).ToList();
-            var allWorkDiaryList = _businessWorkDiary.GetList(null, out int totalCount, x => userAccounts.Contains(x.CreatedById) && x.Dt >= begDate && x.Dt <= begDate.AddMonths(1).AddDays(-1), "Dt");
+            var allWorkDiaryList = _businessWorkDiary.GetList(null, out int totalCount, x => userAccounts.Contains(x.CreatedById) && x.Dt >= yearMonth && x.Dt <= yearMonth.AddMonths(1).AddDays(-1), "Dt");
             var hasWorkDiaryAcconts = allWorkDiaryList.Select(x => x.CreatedById).Distinct().ToList();
             userExpList = userExpList.Where(x => hasWorkDiaryAcconts.Contains(x.Id)).ToList();
             userAccounts = userExpList.Select(x => (int?)x.Id).ToList();
 
             var sheetNames = userExpList.Select(x => x.Name).ToList();
-            var excelName = contractedSupplier + begDate.ToString("yyyyMM") + "日报";
+            var excelName = contractedSupplier + yearMonth.ToString("yyyyMM") + "日报";
             string path = @"C:\Users\16273\Desktop\DailyRecord\MyNetCore\";   //return path;
 
             #region 创建工作簿、克隆sheet页、获取特定单元格位置、赋值单元格日志值
@@ -125,7 +125,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 nameof(WorkDiaryInfo.EndWorkTimeExport),
                 nameof(WorkDiaryInfo.NormalWorkHour),
                 nameof(WorkDiaryInfo.ExtraWorkHour),
-                nameof(WorkDiaryInfo.SubtotalWorkDay),
+                nameof(WorkDiaryInfo.SubtotalWorkHour),
                 nameof(WorkDiaryInfo.Remark)
             };
             List<string> speCellNameList_summary = new List<string>{
@@ -164,7 +164,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
             PropertyInfo[] propertyInfos_user = typeof(Users).GetProperties();
             PropertyInfo[] propertyInfos_diary = typeof(WorkDiaryInfo).GetProperties();
             WorkDiaryInfo.projectList = new BusinessJobClassification().GetList(null, out _, null).ToList();
-            using (FileStream stream = new FileStream(exportExcelName, FileMode.Create, FileAccess.Write))  // If the file already  exists, it will be overwritten. 
+            using (FileStream stream = new FileStream(exportExcelName, FileMode.Create, FileAccess.Write))  // If the file already exists, it will be overwritten. 
             {
                 foreach (var userId in userAccounts)  //对每个用户循环处理
                 {
@@ -190,7 +190,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                         {
                             ICell cell = curUserSheet.GetRow(x++).GetCell(y);
 
-                            if (cellName == nameof(WorkDiaryInfo.NormalWorkHour) || cellName == nameof(WorkDiaryInfo.ExtraWorkHour) || cellName == nameof(WorkDiaryInfo.SubtotalWorkDay))
+                            if (cellName == nameof(WorkDiaryInfo.NormalWorkHour) || cellName == nameof(WorkDiaryInfo.ExtraWorkHour) || cellName == nameof(WorkDiaryInfo.SubtotalWorkHour))
                             {
                                 var val = propertyInfo.GetValue(userDiary);
                                 if (val != null)
@@ -216,15 +216,15 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                         switch (cellName)
                         {
                             case "yyyyMM":
-                                string valyyyyMM = begDate.ToString("yyyy/MM");
+                                string valyyyyMM = yearMonth.ToString("yyyy/MM");
                                 cell.SetCellValue(valyyyyMM);
                                 break;
                             case "ChargeDayNum":
-                                double valChargeDayNum = curUserWorkDiaryList.Where(x => x.SubtotalWorkDay != null && x.SubtotalWorkDay != 0).Count();
+                                double valChargeDayNum = curUserWorkDiaryList.Where(x => x.SubtotalWorkHour != null && x.SubtotalWorkHour != 0).Count();
                                 cell.SetCellValue(valChargeDayNum);
                                 break;
                             case "BisTripDayNum":
-                                double valBisTripDayNum = curUserWorkDiaryList.Where(x => x.SubtotalWorkDay != null && x.SubtotalWorkDay != 0 && (x.WhetherOnBusinessTrip ?? false)).Count();
+                                double valBisTripDayNum = curUserWorkDiaryList.Where(x => x.SubtotalWorkHour != null && x.SubtotalWorkHour != 0 && (x.WhetherOnBusinessTrip ?? false)).Count();
                                 cell.SetCellValue(valBisTripDayNum);
                                 break;
                             default:
@@ -266,7 +266,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
             workDiaryInfoDB.EndWorkTime = workDiaryInfo.EndWorkTime;
             workDiaryInfoDB.NormalWorkHour = workDiaryInfo.NormalWorkHour;
             workDiaryInfoDB.ExtraWorkHour = workDiaryInfo.ExtraWorkHour;
-            workDiaryInfoDB.SubtotalWorkDay = Math.Round((((workDiaryInfoDB.NormalWorkHour ?? 0) + (workDiaryInfoDB.ExtraWorkHour ?? 0)) / 8), 2);
+            workDiaryInfoDB.SubtotalWorkHour = Math.Round((((workDiaryInfoDB.NormalWorkHour ?? 0) + (workDiaryInfoDB.ExtraWorkHour ?? 0)) / 8), 2);
             workDiaryInfoDB.Remark = workDiaryInfo.Remark;
 
             if ((workDiaryInfoDB.BegWorkTime == null && workDiaryInfoDB.EndWorkTime != null) || (workDiaryInfoDB.BegWorkTime != null && workDiaryInfoDB.EndWorkTime == null))

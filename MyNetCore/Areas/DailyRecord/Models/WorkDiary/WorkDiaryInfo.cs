@@ -92,7 +92,7 @@ namespace MyNetCore.Models
         /// </summary>
         [Display(Name = "小计")]
         //[CustomColumn(isRequired: true)]
-        public virtual double? SubtotalWorkDay { get; set; }
+        public virtual double? SubtotalWorkHour { get; set; }
 
         /// <summary>
         /// 备注

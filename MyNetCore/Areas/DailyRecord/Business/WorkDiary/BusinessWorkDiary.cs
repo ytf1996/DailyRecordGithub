@@ -60,7 +60,7 @@ namespace MyNetCore.Business
                         item.EndWorkTime = dt.AddHours(17);
                         item.NormalWorkHour = isWorkDay ? 8 : 0;
                         item.ExtraWorkHour = 0;
-                        item.SubtotalWorkDay = Math.Round((((item.NormalWorkHour ?? 0) + (item.ExtraWorkHour ?? 0)) / 8), 2);
+                        item.SubtotalWorkHour = Math.Round((((item.NormalWorkHour ?? 0) + (item.ExtraWorkHour ?? 0)) / 8), 2);
                     }
                     Add(item);
                 }

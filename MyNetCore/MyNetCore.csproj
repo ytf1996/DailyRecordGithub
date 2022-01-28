@@ -73,4 +73,14 @@
     <Folder Include="wwwroot\lib\microsoft\signalr\dist\browser\" />
   </ItemGroup>
 
+
+
+
+
+  <ItemGroup>
+    <None Update="Excel\日志导出模板.xlsx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
