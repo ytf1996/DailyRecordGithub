@@ -100,7 +100,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
 
             var sheetNames = userExpList.Select(x => x.Name).ToList();
             var excelName = contractedSupplier + yearMonth.ToString("yyyyMM") + "日报";
-            string path = @"C:\Users\16273\Desktop\DailyRecord\MyNetCore\";   //return path;
+            string path = AppContext.BaseDirectory + @"Excel\";  // @"C:\Users\16273\Desktop\DailyRecord\MyNetCore\";   //return path;
 
             #region 创建工作簿、克隆sheet页、获取特定单元格位置、赋值单元格日志值
             XSSFWorkbook workbookTemplate;
@@ -235,9 +235,17 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 downLoadWorkBook.Write(stream);
             }
             downLoadWorkBook.Close();
+
+            byte[] excelBuffer;
+            using (FileStream stream = new FileStream(exportExcelName, FileMode.Open, FileAccess.Read))
+            {
+                excelBuffer = new byte[stream.Length];
+                stream.Read(excelBuffer, 0, excelBuffer.Length);
+            }
+            var base64CodeStr = Convert.ToBase64String(excelBuffer);
             #endregion
 
-            return Success();
+            return Success(data: base64CodeStr);
         }
 
 
