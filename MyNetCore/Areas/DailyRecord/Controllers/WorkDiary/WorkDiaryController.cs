@@ -5,6 +5,7 @@ using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -77,7 +78,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         /// <param name="yearMonth">年月</param>
         /// <param name="contractedSupplier">公司</param>
         /// <returns></returns>
-        public IActionResult ExportDailyReport(DateTime yearMonth, string contractedSupplier)
+        public string ExportDailyReport(DateTime yearMonth, string contractedSupplier)
         {
             yearMonth = new DateTime(yearMonth.Year, yearMonth.Month, 1);
 
@@ -236,6 +237,14 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
             }
             downLoadWorkBook.Close();
 
+            return exportExcelName;
+        }
+
+
+        public IActionResult ExportDailyReport_base64string(DateTime yearMonth, string contractedSupplier)
+        {
+            var exportExcelName = ExportDailyReport(yearMonth, contractedSupplier);
+
             byte[] excelBuffer;
             using (FileStream stream = new FileStream(exportExcelName, FileMode.Open, FileAccess.Read))
             {
@@ -247,6 +256,33 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
 
             return Success(data: base64CodeStr);
         }
+
+        public IActionResult ExportDailyReport_url(DateTime yearMonth, string contractedSupplier)
+        {
+            var exportExcelName = ExportDailyReport(yearMonth, contractedSupplier);
+            var subPath = exportExcelName.Substring(AppContext.BaseDirectory.Length);
+            var excelIpPort = "http://121.5.53.146:6453/";
+            //var excelIpPort = "http://192.168.1.3:8060/";
+            return Success(data: excelIpPort + subPath.Replace("\\", "/"));
+        }
+
+        /// <summary>
+        /// 获取本机IP
+        /// </summary>
+        /// <returns></returns>
+        //public virtual List<string> GetIps()
+        //{
+        //    var ips = System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces()
+        //    .Select(p => p.GetIPProperties())
+        //    .SelectMany(p => p.UnicastAddresses)
+        //    .Where(p => p.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork && !System.Net.IPAddress.IsLoopback(p.Address))
+        //    .ToList();
+
+        //    List<string> ipValues = ips.Select(x => x.Address.ToString()).ToList();
+
+        //    return ipValues;
+        //}
+
 
 
         /// <summary>
