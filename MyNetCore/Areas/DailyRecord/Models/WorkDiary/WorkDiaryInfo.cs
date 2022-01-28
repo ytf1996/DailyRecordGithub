@@ -79,20 +79,20 @@ namespace MyNetCore.Models
         /// </summary>
         [Display(Name = "正常小时工作数（小时）")]
         //[CustomColumn(isRequired: true)]
-        public virtual decimal? NormalWorkHour { get; set; }
+        public virtual double? NormalWorkHour { get; set; }
 
         /// <summary>
         /// 加班（小时）
         /// </summary>
         [Display(Name = "加班（小时）")]
-        public virtual decimal? ExtraWorkHour { get; set; }
+        public virtual double? ExtraWorkHour { get; set; }
 
         /// <summary>
         /// 小计
         /// </summary>
         [Display(Name = "小计")]
         //[CustomColumn(isRequired: true)]
-        public virtual decimal? SubtotalWorkDay { get; set; }
+        public virtual double? SubtotalWorkDay { get; set; }
 
         /// <summary>
         /// 备注
@@ -175,17 +175,17 @@ namespace MyNetCore.Models
         /// <summary>
         /// 正常小时
         /// </summary>
-        public virtual decimal? NormalWorkHourSummary { get; set; }
+        public virtual double? NormalWorkHourSummary { get; set; }
 
         /// <summary>
         /// 加班工时
         /// </summary>
-        public virtual decimal? ExtraWorkHourSummary { get; set; }
+        public virtual double? ExtraWorkHourSummary { get; set; }
 
         /// <summary>
         /// 合计工作工时
         /// </summary>
-        public virtual decimal? SubtotalWorkHourSummary { get; set; }
+        public virtual double? SubtotalWorkHourSummary { get; set; }
 
         /// <summary>
         /// 收费天数

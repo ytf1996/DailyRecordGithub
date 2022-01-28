@@ -73,7 +73,7 @@ namespace MyNetCore.Business
                 if (apiUserModel != null && apiUserModel.EffectDateTime >= DateTime.Now && apiUserModel.CurrentUser != null)
                 {
                     currentUser = apiUserModel.CurrentUser;
-                    apiUserModel.EffectDateTime = DateTime.Now.AddMinutes(ApiUserEffectMinutes);
+                    apiUserModel.EffectDateTime = DateTime.Now.AddHours(24); //DateTime.Now.AddMinutes(ApiUserEffectMinutes);
                     BusinessAccessToken businessAccessToken = new BusinessAccessToken();
                     businessAccessToken.Edit(apiUserModel, false);
                     //DB.SaveChanges();

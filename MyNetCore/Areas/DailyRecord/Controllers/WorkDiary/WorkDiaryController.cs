@@ -190,7 +190,22 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                         {
                             ICell cell = curUserSheet.GetRow(x++).GetCell(y);
 
-                            cell.SetCellValue(propertyInfo.GetValue(userDiary)?.ToString());
+                            if (cellName == nameof(WorkDiaryInfo.NormalWorkHour) || cellName == nameof(WorkDiaryInfo.ExtraWorkHour) || cellName == nameof(WorkDiaryInfo.SubtotalWorkDay))
+                            {
+                                var val = propertyInfo.GetValue(userDiary);
+                                if (val != null)
+                                {
+                                    cell.SetCellValue((double)val);
+                                }
+                                else
+                                {
+                                    cell.SetCellValue((string)null);
+                                }
+                            }
+                            else
+                            {
+                                cell.SetCellValue(propertyInfo.GetValue(userDiary)?.ToString());
+                            }
                         });
                     });
 
@@ -198,23 +213,23 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                     {
                         ICell cell = curUserSheet.GetRow(dic[cellName].Item1).GetCell(dic[cellName].Item2);
 
-                        var val = string.Empty;
                         switch (cellName)
                         {
                             case "yyyyMM":
-                                val = begDate.ToString("yyyy/MM");
+                                string valyyyyMM = begDate.ToString("yyyy/MM");
+                                cell.SetCellValue(valyyyyMM);
                                 break;
                             case "ChargeDayNum":
-                                val = curUserWorkDiaryList.Where(x => x.SubtotalWorkDay != null && x.SubtotalWorkDay != 0).Count().ToString();
+                                double valChargeDayNum = curUserWorkDiaryList.Where(x => x.SubtotalWorkDay != null && x.SubtotalWorkDay != 0).Count();
+                                cell.SetCellValue(valChargeDayNum);
                                 break;
                             case "BisTripDayNum":
-                                val = curUserWorkDiaryList.Where(x => x.SubtotalWorkDay != null && x.SubtotalWorkDay != 0 && (x.WhetherOnBusinessTrip ?? false)).Count().ToString();
+                                double valBisTripDayNum = curUserWorkDiaryList.Where(x => x.SubtotalWorkDay != null && x.SubtotalWorkDay != 0 && (x.WhetherOnBusinessTrip ?? false)).Count();
+                                cell.SetCellValue(valBisTripDayNum);
                                 break;
                             default:
                                 break;
                         }
-
-                        cell.SetCellValue(val);
                     });
                 }
                 downLoadWorkBook.Write(stream);
