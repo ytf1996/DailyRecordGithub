@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace MyNetCore.Models
 {
@@ -93,7 +92,7 @@ namespace MyNetCore.Models
         /// </summary>
         [Display(Name = "小计")]
         //[CustomColumn(isRequired: true)]
-        public virtual decimal? SubtotalWorkHour { get; set; }
+        public virtual decimal? SubtotalWorkDay { get; set; }
 
         /// <summary>
         /// 备注
@@ -101,6 +100,16 @@ namespace MyNetCore.Models
         [MaxLength(4000)]
         [Display(Name = "备注")]
         public virtual string Remark { get; set; }
+
+
+        #region 非DB   （用于日报导出）
+        public static List<JobClassificationInfo> projectList = new List<JobClassificationInfo>();
+
+        /// <summary>
+        /// 日期
+        /// </summary>
+        [NotMapped]
+        public virtual string DtExport => Dt.ToString("yyyy/MM/dd");
 
         /// <summary>
         /// 星期
@@ -123,6 +132,30 @@ namespace MyNetCore.Models
                 }
             }
         }
+
+        /// <summary>
+        /// 是否出差
+        /// </summary>
+        [NotMapped]
+        public virtual string WhetherOnBusinessTripExport => WhetherOnBusinessTrip ?? false ? "No" : "Yes";
+
+        /// <summary>
+        /// 工作分类信息Id
+        /// </summary>
+        [NotMapped]
+        public virtual string JobClassificationInfoIdExport => projectList.Where(x => x.Id == JobClassificationInfoId).FirstOrDefault()?.ClassificationName;
+        /// <summary>
+        /// 上班时间
+        /// </summary>
+        [NotMapped]
+        public virtual string BegWorkTimeExport => BegWorkTime?.ToString("hh:mm");
+
+        /// <summary>
+        /// 下班时间
+        /// </summary>
+        [NotMapped]
+        public virtual string EndWorkTimeExport => EndWorkTime?.ToString("hh:mm");
+        #endregion
     }
 
 
@@ -177,7 +210,7 @@ namespace MyNetCore.Models
 
     public class MonthData
     {
-        public List<EachDayInfo>List  { get; set; }
+        public List<EachDayInfo> List { get; set; }
 
         public int Page { get; set; }
 
@@ -227,11 +260,11 @@ namespace MyNetCore.Models
     }
 
 
-    //public enum WorkOrHoliday
-    //{
-    //    WorkDay = 1,
+    public class WorkOrHoliday
+    {
+        public const string WorkDay = "1";
 
-    //    Holiday = 2
-    //}
+        public const string Holiday = "2";
+    }
     #endregion
 }

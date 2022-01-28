@@ -45,7 +45,7 @@ namespace MyNetCore.Business
                     var calendarItem = calendarList.Where(x => x.Date == dt.ToString("yyyyMMdd")).FirstOrDefault();
                     dynamic isWorkDay;
                     if (calendarItem != null)
-                        isWorkDay = calendarItem?.Workday == "1";
+                        isWorkDay = calendarItem?.Workday == WorkOrHoliday.WorkDay;
                     else
                         isWorkDay = dt.DayOfWeek != DayOfWeek.Saturday && dt.DayOfWeek != DayOfWeek.Sunday;
                     item = new WorkDiaryInfo
@@ -53,15 +53,15 @@ namespace MyNetCore.Business
                         Dt = dt,
                         WhatDay = (int)dt.DayOfWeek,
                         WhetherOnBusinessTrip = false,
-                        NormalWorkHour = isWorkDay ? 8 : 0,
-                        ExtraWorkHour = 0
                     };
                     if (isWorkDay)
                     {
                         item.BegWorkTime = dt.AddHours(8);
                         item.EndWorkTime = dt.AddHours(17);
+                        item.NormalWorkHour = isWorkDay ? 8 : 0;
+                        item.ExtraWorkHour = 0;
+                        item.SubtotalWorkDay = Math.Round((((item.NormalWorkHour ?? 0) + (item.ExtraWorkHour ?? 0)) / 8), 2);
                     }
-                    item.SubtotalWorkHour = item.NormalWorkHour + item.ExtraWorkHour;
                     Add(item);
                 }
             }
