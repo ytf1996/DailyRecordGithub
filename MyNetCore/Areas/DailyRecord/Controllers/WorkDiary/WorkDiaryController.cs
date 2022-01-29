@@ -263,7 +263,8 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
             var subPath = exportExcelName.Substring(AppContext.BaseDirectory.Length);
             var excelIpPort = "http://121.5.53.146:6453/";
             //var excelIpPort = "http://192.168.1.3:8060/";
-            return Success(data: excelIpPort + subPath.Replace("\\", "/"));
+
+            return Success(data: excelIpPort + System.Web.HttpUtility.UrlEncode(subPath.Replace("\\", "/")));
         }
 
         /// <summary>
