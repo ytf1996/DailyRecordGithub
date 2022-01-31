@@ -38,7 +38,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
 
             PlanShowDto rtnDto = new PlanShowDto();
 
-            var projectList = _businessProjectClassification.GetList(null, out int totalCount, null, "Id");
+            var projectList = _businessProjectClassification.GetList(null, out int totalCount, null, "Order");
             rtnDto.WeeklyProjects = projectList.Select(x => new WeeklyProject
             {
                 ProjectClassificationInfoId = x.Id.ToString(),
@@ -102,7 +102,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 throw new Exception("您无此操作权限");
             }
             PlanShowDto rtnDto = new PlanShowDto();
-            var projectList = _businessProjectClassification.GetList(null, out int totalCount, null, "Id");
+            var projectList = _businessProjectClassification.GetList(null, out int totalCount, null, "Order");
             rtnDto.WeeklyProjects = projectList.Select(x => new WeeklyProject
             {
                 ProjectClassificationInfoId = x.Id.ToString(),

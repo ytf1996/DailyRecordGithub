@@ -20,6 +20,13 @@ namespace MyNetCore.Models
         [Display(Name = "分类名称")]
         [CustomColumn(isRequired: true)]
         public virtual string ClassificationName { get; set; }
+
+        /// <summary>
+        /// 项目排序
+        /// </summary>
+        [MaxLength(50)]
+        [Display(Name = "项目排序")]
+        public virtual string Order { get; set; }
     }
 
 }
