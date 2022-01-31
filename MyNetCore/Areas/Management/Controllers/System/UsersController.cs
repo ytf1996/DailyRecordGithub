@@ -132,6 +132,7 @@ namespace MyNetCore.Areas.Management.Controllers
                          CounselorPropertyVal = m.CounselorPropertyVal?.GetCustomDescription(),
                          ServiceUnit = m.ServiceUnit,
                          ContractedSupplier = m.ContractedSupplier,
+                         Duty=m.Duty,
                          Group = m.Group,
                          UserOrder = m.UserOrder,
                          ChannelId = m.ChannelsName,

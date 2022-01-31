@@ -209,6 +209,11 @@ namespace MyNetCore.Models
         [Display(Name = "人员序号")]
         public string UserOrder { get; set; }
 
+        /// <summary>
+        /// 职责
+        /// </summary>
+        [Display(Name = "职责")]
+        public string Duty { get; set; }
 
         #region 非DB
         [NotMapped]

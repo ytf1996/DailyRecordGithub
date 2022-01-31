@@ -97,6 +97,10 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
             {
                 throw new Exception("用户未登录");
             }
+            if (!currentUser.IsAdmin)
+            {
+                throw new Exception("您无此操作权限");
+            }
             PlanShowDto rtnDto = new PlanShowDto();
             var projectList = _businessProjectClassification.GetList(null, out int totalCount, null, "Id");
             rtnDto.WeeklyProjects = projectList.Select(x => new WeeklyProject
@@ -123,7 +127,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
             new {
                 UserId = _.CreatedBy.Id,
                 Company = _.CreatedBy.ContractedSupplier,
-                Duty = "333",//_.CreatedBy.Duty ,
+                Duty = _.CreatedBy.Duty ,
                 UserName = _.CreatedBy.Name,
                 UserOrder = _.CreatedBy.UserOrder
             }
@@ -135,7 +139,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 DataRow dr = table.NewRow();
                 dr["userOrder"] = item.UserOrder;
                 dr["company"] = item.Company;
-                dr["duty"] = item.Duty + "职责";  //item.user.duty ;
+                dr["duty"] = item.Duty;
                 dr["userName"] = item.UserName;
                 rtnDto.WeeklyProjects.ForEach(project =>
                 {
