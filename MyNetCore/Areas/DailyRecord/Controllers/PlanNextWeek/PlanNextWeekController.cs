@@ -79,13 +79,83 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
             return Success(data: rtnDto.ToJsonString());
         }
 
+        /// <summary>
+        /// 获取自然周开始时间的工作计划安排
+        /// </summary>
+        /// <returns></returns>
+        public IActionResult ListAll(DateTime begDate, DateTime endDate)
+        {
+            begDate = new DateTime(begDate.Year, begDate.Month, begDate.Day);
+            endDate = new DateTime(endDate.Year, endDate.Month, endDate.Day);
+            if (begDate > endDate)
+            {
+                throw new Exception($"开始时间{begDate}大于结束时间{endDate}");
+            }
+
+            var currentUser = GetCurrentUserInfo();
+            if (currentUser == null)
+            {
+                throw new Exception("用户未登录");
+            }
+            PlanShowDto rtnDto = new PlanShowDto();
+            var projectList = _businessProjectClassification.GetList(null, out int totalCount, null, "Id");
+            rtnDto.WeeklyProjects = projectList.Select(x => new WeeklyProject
+            {
+                ProjectClassificationInfoId = x.Id.ToString(),
+                ClassificationName = x.ClassificationName
+            }).ToList();
+
+            DataTable table = new DataTable();
+            table.Columns.Add("userOrder", typeof(string));
+            table.Columns.Add("company", typeof(string));
+            table.Columns.Add("duty", typeof(string));
+            table.Columns.Add("userName", typeof(string));
+
+            rtnDto.WeeklyProjects.ForEach(x =>
+            {
+                table.Columns.Add(x.ProjectClassificationInfoId.ToString(), typeof(string));
+            });
+            //本周所有人的数据
+            var dataList = _businessPlanNextWeek.GetList(null, out int beftotalCount, x => x.BegDate >= begDate && x.BegDate <= endDate /*&& x.CreatedById == currentUser.Id*/).ToList();
+            //每人每周只有多条查询记录
+
+            var users = dataList.Select(_ =>
+            new {
+                UserId = _.CreatedBy.Id,
+                Company = _.CreatedBy.ContractedSupplier,
+                Duty = "333",//_.CreatedBy.Duty ,
+                UserName = _.CreatedBy.Name,
+                UserOrder = _.CreatedBy.UserOrder
+            }
+            ).Distinct().OrderBy(_ => _.UserOrder).ToList();
+
+            foreach (var item in users)
+            {
+                var row = dataList.Where(_ => _.CreatedById == item.UserId).ToList();
+                DataRow dr = table.NewRow();
+                dr["userOrder"] = item.UserOrder;
+                dr["company"] = item.Company;
+                dr["duty"] = item.Duty + "职责";  //item.user.duty ;
+                dr["userName"] = item.UserName;
+                rtnDto.WeeklyProjects.ForEach(project =>
+                {
+                    var pPlanNextWeekInfo = row.Where(x => x.ProjectClassificationInfoId.ToString() == project.ProjectClassificationInfoId.ToString()).FirstOrDefault();
+                    dr[project.ProjectClassificationInfoId.ToString()] = new CellDto { Id = pPlanNextWeekInfo?.Id, JobContent = pPlanNextWeekInfo?.JobContent }.ToJsonString();
+                });
+                table.Rows.Add(dr);
+
+            }
+
+            rtnDto.WeeklyData = table;
+            return Success(data: rtnDto.ToJsonString());
+        }
 
         /// <summary>
         /// 获取自然周开始时间的工作计划安排(管理员)
         /// </summary>
         /// <param name="begDate"></param>
         /// <returns></returns>
-        public IActionResult List_ShowAll_ForAdministrator(DateTime begDate)           //待定
+        public IActionResult List_ShowAll_ForAdministrator(DateTime begDate, DateTime endDate)
         {
             //_businessPlanNextWeek.CheckDate(begDate);
 
@@ -99,7 +169,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 throw new Exception("您无此操作权限");
             }
 
-            var list = _businessPlanNextWeek.GetList(null, out int totalCount, x => x.BegDate == begDate);
+            var list = _businessPlanNextWeek.GetList(null, out int totalCount, x => x.BegDate >= begDate && x.BegDate <= endDate);
 
             var result = list.OrderBy(x => x.CreatedById).ThenBy(x => x.ProjectClassificationInfoId).ToList();
 

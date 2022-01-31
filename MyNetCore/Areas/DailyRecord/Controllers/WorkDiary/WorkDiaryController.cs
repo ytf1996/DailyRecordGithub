@@ -318,9 +318,18 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
             {
                 throw new LogicException("请填写完整上下班时间或均不填写");
             }
-            if (!(workDiaryInfoDB.Dt <= workDiaryInfoDB.BegWorkTime && workDiaryInfoDB.BegWorkTime < workDiaryInfoDB.EndWorkTime && workDiaryInfoDB.EndWorkTime <= workDiaryInfoDB.Dt.AddDays(1)))
+            //if (!(workDiaryInfoDB.Dt <= workDiaryInfoDB.BegWorkTime && workDiaryInfoDB.BegWorkTime < workDiaryInfoDB.EndWorkTime && workDiaryInfoDB.EndWorkTime <= workDiaryInfoDB.Dt.AddDays(1)))
+            //{
+            //    throw new LogicException("上下班时间应在当天之内，请重新填写");
+            //}
+            if (workDiaryInfoDB.BegWorkTime != null && workDiaryInfoDB.EndWorkTime != null)
             {
-                throw new LogicException("上下班时间应在当天之内，请重新填写");
+                workDiaryInfoDB.BegWorkTime = workDiaryInfoDB.Dt.Date + workDiaryInfoDB.BegWorkTime?.TimeOfDay;
+                workDiaryInfoDB.EndWorkTime = workDiaryInfoDB.Dt.Date + workDiaryInfoDB.EndWorkTime?.TimeOfDay;
+            }
+            if (workDiaryInfoDB.BegWorkTime != null && workDiaryInfoDB.EndWorkTime != null && (workDiaryInfoDB.BegWorkTime >= workDiaryInfoDB.EndWorkTime))
+            {
+                throw new LogicException("上班时间必须小于下班时间");
             }
             if ((workDiaryInfoDB.NormalWorkHour ?? 0) + (workDiaryInfoDB.ExtraWorkHour ?? 0) > 24)
             {

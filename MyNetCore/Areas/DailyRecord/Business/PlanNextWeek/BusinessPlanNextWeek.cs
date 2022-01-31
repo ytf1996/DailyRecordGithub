@@ -78,9 +78,10 @@ namespace MyNetCore.Business
 
             if (result.Count > 0)
             {
-                var project = new BusinessProjectClassification().GetList(null, out int totalCount, x => x.Id == projectClassificationInfoId).FirstOrDefault()?.ClassificationName ?? projectClassificationInfoId.ToString();
+                //var project = new BusinessProjectClassification().GetList(null, out int totalCount, x => x.Id == projectClassificationInfoId).FirstOrDefault()?.ClassificationName ?? projectClassificationInfoId.ToString();
 
-                throw new Exception($"当前用户已存在 日期{begDate}所属星期、项目{project}的记录");
+                //throw new Exception($"当前用户已存在 日期{begDate}所属星期、项目{project}的记录");
+                throw new Exception("周计划已存在");
             }
         }
     }
