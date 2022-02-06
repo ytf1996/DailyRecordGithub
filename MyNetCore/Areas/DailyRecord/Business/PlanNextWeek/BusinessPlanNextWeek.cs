@@ -62,11 +62,12 @@ namespace MyNetCore.Business
         //}
 
 
-        public void CheckRepeat(DateTime begDate, int projectClassificationInfoId, Users currentUser, bool isUpdate=false, int updatedId=0)
+        public void CheckRepeat(DateTime begDate, int projectClassificationInfoId, Users currentUser, bool isUpdate = false, int updatedId = 0)
         {
-            var dayOfWeek = begDate.DayOfWeek; //新增日期的所属星期几    0-6
-            var dayBegOfWeek = begDate.AddDays(-(int)dayOfWeek); //获取该日期所属星期的第一天
-            var dayEndOfWeek = begDate.AddDays(6 - (int)dayOfWeek); //获取该日期所属星期的第七天
+            int dayOfWeek = (int)begDate.DayOfWeek; //新增日期的所属星期几    0-6
+            if (dayOfWeek == 0) dayOfWeek = 7;
+            var dayBegOfWeek = begDate.AddDays(-(dayOfWeek - 1)); //获取该日期所属星期的第一天
+            var dayEndOfWeek = begDate.AddDays(7 - dayOfWeek); //获取该日期所属星期的第七天
 
             var list = GetList(null, out int beftotalCount, x => x.BegDate >= dayBegOfWeek && x.BegDate <= dayEndOfWeek && x.ProjectClassificationInfoId == projectClassificationInfoId && x.CreatedById == currentUser.Id);
 

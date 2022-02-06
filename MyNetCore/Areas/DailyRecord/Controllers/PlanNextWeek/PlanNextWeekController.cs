@@ -203,10 +203,10 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 {
                     throw new LogicException("项目分类不能为空");
                 }
-                if (string.IsNullOrWhiteSpace(item.JobContent))
-                {
-                    throw new LogicException("工作计划安排内容不能为空");
-                }
+                //if (string.IsNullOrWhiteSpace(item.JobContent))
+                //{
+                //    throw new LogicException("工作计划安排内容不能为空");
+                //}
                 planDto.BegDate= new DateTime(planDto.BegDate.Year, planDto.BegDate.Month, planDto.BegDate.Day);
                 _businessPlanNextWeek.CheckRepeat(planDto.BegDate, Convert.ToInt32(item.ProjectClassificationInfoId), currentUser);
                 var pPlanNextWeekInfo = new PlanNextWeekInfo
