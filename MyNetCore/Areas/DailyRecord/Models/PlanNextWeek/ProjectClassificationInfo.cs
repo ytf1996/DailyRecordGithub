@@ -11,6 +11,7 @@ namespace MyNetCore.Models
     /// <summary>
     /// 项目分类
     /// </summary>
+    [DisplayName(name: "项目分类", parentMenuName: "项目分类管理", icons: "fa fa-ticket", orderNum: 210, onlyForAdmin: false, isMenu: false)]
     public class ProjectClassificationInfo : BaseModel
     {
         /// <summary>

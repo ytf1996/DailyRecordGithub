@@ -11,6 +11,7 @@ namespace MyNetCore.Models
     /// <summary>
     /// 工作分类
     /// </summary>
+    [DisplayName(name: "工作分类", parentMenuName: "工作分类管理", icons: "fa fa-ticket", orderNum: 210, onlyForAdmin: false, isMenu: false)]
     public class JobClassificationInfo : BaseModel
     {
         /// <summary>

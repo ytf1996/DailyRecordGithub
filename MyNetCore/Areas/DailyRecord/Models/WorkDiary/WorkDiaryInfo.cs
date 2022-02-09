@@ -9,6 +9,7 @@ namespace MyNetCore.Models
     /// <summary>
     /// 工作日志
     /// </summary>
+    [DisplayName(name: "工作日志", parentMenuName: "工作日志管理", icons: "fa fa-ticket", orderNum: 210, onlyForAdmin: false, isMenu: false)]
     public class WorkDiaryInfo : BaseModel
     {
         /// <summary>

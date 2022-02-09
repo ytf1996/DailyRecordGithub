@@ -11,6 +11,7 @@ namespace MyNetCore.Models
     /// <summary>
     /// 下周计划
     /// </summary>
+    [DisplayName(name: "下周计划", parentMenuName: "下周计划管理", icons: "fa fa-ticket", orderNum: 210, onlyForAdmin: false, isMenu: false)]
     public class PlanNextWeekInfo : BaseModel
     {
         /// <summary>
