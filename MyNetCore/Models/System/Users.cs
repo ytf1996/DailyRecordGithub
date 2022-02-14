@@ -215,6 +215,14 @@ namespace MyNetCore.Models
         [Display(Name = "职责")]
         public string Duty { get; set; }
 
+        /// <summary>
+        /// 是否导出（日报、周报）  // 1导出      0不导出
+        /// </summary>
+        public int IfExport { get; set; }
+
+
+
+
         #region 非DB
         [NotMapped]
         public string CounselorPropertyDes

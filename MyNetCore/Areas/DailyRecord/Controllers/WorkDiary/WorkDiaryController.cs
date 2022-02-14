@@ -92,7 +92,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 throw new Exception("您无此操作权限");
             }
 
-            var userExpList = _businessUsers.GetList(null, out int userTotalCount, x => x.ContractedSupplier == contractedSupplier && !x.Disabled, "UserOrder", null, false).ToList();
+            var userExpList = _businessUsers.GetList(null, out int userTotalCount, x => x.ContractedSupplier == contractedSupplier&& x.IfExport == 1 && !x.Disabled, "UserOrder", null, false).ToList();
             var userAccounts = userExpList.Select(x => (int?)x.Id).ToList();
             var allWorkDiaryList = _businessWorkDiary.GetList(null, out int totalCount, x => userAccounts.Contains(x.CreatedById) && x.Dt >= yearMonth && x.Dt <= yearMonth.AddMonths(1).AddDays(-1), "Dt");
             var hasWorkDiaryAcconts = allWorkDiaryList.Select(x => x.CreatedById).Distinct().ToList();

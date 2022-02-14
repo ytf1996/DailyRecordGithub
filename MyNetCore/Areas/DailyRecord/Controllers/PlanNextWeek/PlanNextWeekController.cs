@@ -13,7 +13,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
     {
         private BusinessPlanNextWeek _businessPlanNextWeek = new BusinessPlanNextWeek();
         private BusinessProjectClassification _businessProjectClassification = new BusinessProjectClassification();
-
+        private BusinessUsers _businessUsers = new BusinessUsers();
 
         /// <summary>
         /// 获取自然周开始时间的工作计划安排
@@ -119,19 +119,20 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
             {
                 table.Columns.Add(x.ProjectClassificationInfoId.ToString(), typeof(string));
             });
-            //本周所有人的数据
-            var dataList = _businessPlanNextWeek.GetList(null, out int beftotalCount, x => x.BegDate >= begDate && x.BegDate <= endDate /*&& x.CreatedById == currentUser.Id*/).ToList();
-            //每人每周只有多条查询记录
 
-            var users = dataList.Select(_ =>
+            var userExpList = _businessUsers.GetList(null, out int userTotalCount, x => x.IfExport == 1 && !x.Disabled, "UserOrder", null, false).ToList();
+            var users = userExpList.Select(_ =>
             new {
-                UserId = _.CreatedBy.Id,
-                Company = _.CreatedBy.ContractedSupplier,
-                Duty = _.CreatedBy.Duty ,
-                UserName = _.CreatedBy.Name,
-                UserOrder = _.CreatedBy.UserOrder
+                UserId = _.Id,
+                Company = _.ContractedSupplier,
+                Duty = _.Duty ,
+                UserName = _.Name,
+                UserOrder = _.UserOrder
             }
             ).Distinct().OrderBy(_ => _.UserOrder).ToList();
+
+            //本周所有人的数据
+            var dataList = _businessPlanNextWeek.GetList(null, out int beftotalCount, x => x.BegDate >= begDate && x.BegDate <= endDate /*&& x.CreatedById == currentUser.Id*/, "UserOrder").ToList();
 
             foreach (var item in users)
             {
