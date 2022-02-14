@@ -144,7 +144,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 dr["userName"] = item.UserName;
                 rtnDto.WeeklyProjects.ForEach(project =>
                 {
-                    var pPlanNextWeekInfo = row.Where(x => x.ProjectClassificationInfoId.ToString() == project.ProjectClassificationInfoId.ToString()).FirstOrDefault();
+                    var pPlanNextWeekInfo = row?.Where(x => x.ProjectClassificationInfoId.ToString() == project.ProjectClassificationInfoId.ToString()).FirstOrDefault();
                     dr[project.ProjectClassificationInfoId.ToString()] = new CellDto { Id = pPlanNextWeekInfo?.Id, JobContent = pPlanNextWeekInfo?.JobContent }.ToJsonString();
                 });
                 table.Rows.Add(dr);
