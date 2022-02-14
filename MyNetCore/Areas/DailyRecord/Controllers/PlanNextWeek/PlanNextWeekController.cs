@@ -132,7 +132,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
             ).Distinct().OrderBy(_ => _.UserOrder).ToList();
 
             //本周所有人的数据
-            var dataList = _businessPlanNextWeek.GetList(null, out int beftotalCount, x => x.BegDate >= begDate && x.BegDate <= endDate /*&& x.CreatedById == currentUser.Id*/, "UserOrder").ToList();
+            var dataList = _businessPlanNextWeek.GetList(null, out int beftotalCount, x => x.BegDate >= begDate && x.BegDate <= endDate /*&& x.CreatedById == currentUser.Id*/).ToList();
 
             foreach (var item in users)
             {
