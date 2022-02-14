@@ -207,7 +207,7 @@ namespace MyNetCore.Models
         /// 人员序号  （日志周报功能）
         /// </summary>
         [Display(Name = "人员序号")]
-        public string UserOrder { get; set; }
+        public int UserOrder { get; set; }
 
         /// <summary>
         /// 职责
