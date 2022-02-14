@@ -268,4 +268,35 @@ namespace MyNetCore.Models
         public const string Holiday = "2";
     }
     #endregion
+
+
+    public class DiarySummaryDto
+    {
+        /// <summary>
+        /// 人员序号  （日志周报功能）
+        /// </summary>
+        [Display(Name = "人员序号")]
+        public int UserOrder { get; set; }
+
+        /// <summary>
+        /// 姓名
+        /// </summary>
+        [Display(Name = "姓名")]
+        public string UserName { get; set; }
+
+        /// <summary>
+        /// 正常小时
+        /// </summary>
+        public virtual double? NormalWorkHourSummary { get; set; }
+
+        /// <summary>
+        /// 加班工时
+        /// </summary>
+        public virtual double? ExtraWorkHourSummary { get; set; }
+
+        /// <summary>
+        /// 合计工作工时
+        /// </summary>
+        public virtual double? SubtotalWorkHourSummary => NormalWorkHourSummary + ExtraWorkHourSummary;
+    }
 }

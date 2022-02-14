@@ -72,6 +72,107 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         }
 
 
+
+        public IActionResult SummaryCount(DateTime begDate)
+        {
+            begDate = new DateTime(begDate.Year, begDate.Month, 1);
+
+            if (DateTime.Today.AddMonths(3) < begDate) throw new Exception("查询日期最多为当前月往后3个月");
+            //if (begDate != new DateTime(begDate.Year, begDate.Month, 1))
+            //{
+            //    throw new LogicException($"{begDate}不为年月格式，需为每月的第一天");
+            //}
+
+            var currentUser = GetCurrentUserInfo();
+            if (currentUser == null)
+            {
+                throw new Exception("用户未登录");
+            }
+            if (!currentUser.IsAdmin)
+            {
+                throw new Exception("您无此操作权限");
+            }
+
+            var userExpList = _businessUsers.GetList(null, out int userTotalCount, x => x.IfExport == 1 && !x.Disabled, "UserOrder", null, false).ToList();
+
+            List<DiarySummaryDto> list = new List<DiarySummaryDto>();
+
+            userExpList.ForEach(user =>
+            {
+                var beflist = _businessWorkDiary.GetList(null, out int beftotalCount, x => x.Dt >= begDate && x.Dt <= begDate.AddMonths(1).AddDays(-1) && x.CreatedById == user.Id, "Dt");
+
+                var befesult = beflist.ToList();
+
+                _businessWorkDiary.AddDefaultItemWhenNotexist(befesult, begDate);//检查并新增空默认行项
+
+                var aftlist = _businessWorkDiary.GetList(null, out int afttotalCount, x => x.Dt >= begDate && x.Dt <= begDate.AddMonths(1).AddDays(-1) && x.CreatedById == user.Id, "Dt");
+
+                var aftresult = aftlist.ToList();
+
+                list.Add(new DiarySummaryDto
+                {
+                    UserOrder = user.UserOrder,
+                    UserName = user.Name,
+                    NormalWorkHourSummary = Math.Round(aftresult.Sum(x => x.NormalWorkHour ?? 0) / 8, 2),        //以人天计
+                    ExtraWorkHourSummary = Math.Round(aftresult.Sum(x => x.ExtraWorkHour ?? 0) / 8, 2)
+                });
+            });
+
+            return Success(data: list);
+        }
+
+
+
+        /// <summary>
+        /// 预览月份+人员  日报信息       (先执行 SummaryCount 方法，后执行本方法)
+        /// </summary>
+        /// <param name="begDate"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public IActionResult PreviewDiary(DateTime begDate, int userId)
+        {
+            begDate = new DateTime(begDate.Year, begDate.Month, 1);
+
+            if (DateTime.Today.AddMonths(3) < begDate) throw new Exception("查询日期最多为当前月往后3个月");
+            //if (begDate != new DateTime(begDate.Year, begDate.Month, 1))
+            //{
+            //    throw new LogicException($"{begDate}不为年月格式，需为每月的第一天");
+            //}
+
+            var currentUser = GetCurrentUserInfo();
+            if (currentUser == null)
+            {
+                throw new Exception("用户未登录");
+            }
+            if (!currentUser.IsAdmin)
+            {
+                throw new Exception("您无此操作权限");
+            }
+            //var beflist = _businessWorkDiary.GetList(null, out int beftotalCount, x => x.Dt >= begDate && x.Dt <= begDate.AddMonths(1).AddDays(-1) && x.CreatedById == userId, "Dt");
+
+            //var befesult = beflist.ToList();
+
+            //_businessWorkDiary.AddDefaultItemWhenNotexist(befesult, begDate);//检查并新增空默认行项
+
+            var aftlist = _businessWorkDiary.GetList(null, out int afttotalCount, x => x.Dt >= begDate && x.Dt <= begDate.AddMonths(1).AddDays(-1) && x.CreatedById == userId, "Dt");
+
+            var aftresult = aftlist.ToList();
+
+            DiaryShowDto rtnDto = new DiaryShowDto();
+
+            rtnDto.DiaryList = aftresult;
+            rtnDto.User = currentUser; //待注释掉
+            rtnDto.NormalWorkHourSummary = aftresult.Sum(x => x.NormalWorkHour ?? 0);
+            rtnDto.ExtraWorkHourSummary = aftresult.Sum(x => x.ExtraWorkHour ?? 0);
+            rtnDto.SubtotalWorkHourSummary = Math.Round((((rtnDto.NormalWorkHourSummary ?? 0) + (rtnDto.ExtraWorkHourSummary ?? 0)) / 8), 2);
+            rtnDto.ChargeDayNum = aftresult.Where(x => x.SubtotalWorkHour != null && x.SubtotalWorkHour != 0).Count();
+            rtnDto.BusinessTripDayNum = aftresult.Where(x => x.SubtotalWorkHour != null && x.SubtotalWorkHour != 0 && (x.WhetherOnBusinessTrip ?? false)).Count();
+
+            return Success(data: rtnDto);
+        }
+
+
+
         /// <summary>
         /// 按公司+年月导出 所有人员的日报 为excel（管理员专用导出功能）
         /// </summary>
