@@ -29,7 +29,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
 
         public IActionResult QueryUserInfoById(int userId)
         {
-            var userInfo = _businessUsers.GetList(null, out int userTotalCount, x => x.Id== userId, null, null, false).ToList();
+            var userInfo = _businessUsers.GetList(null, out int userTotalCount, x => x.Id== userId, null, null, false).FirstOrDefault();
 
             return Success(data: userInfo);
         }
