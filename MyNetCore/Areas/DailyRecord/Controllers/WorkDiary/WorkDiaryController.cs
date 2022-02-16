@@ -27,6 +27,13 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
             return Success(data: currentUser);
         }
 
+        public IActionResult QueryUserInfoById(int userId)
+        {
+            var userInfo = _businessUsers.GetList(null, out int userTotalCount, x => x.Id== userId, null, null, false).ToList();
+
+            return Success(data: userInfo);
+        }
+
         /// <summary>
         /// 获取某一年月的工作日志列表 （若无则新增空的默认行项）
         /// </summary>
