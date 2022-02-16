@@ -99,11 +99,11 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
 
             userExpList.ForEach(user =>
             {
-                var beflist = _businessWorkDiary.GetList(null, out int beftotalCount, x => x.Dt >= begDate && x.Dt <= begDate.AddMonths(1).AddDays(-1) && x.CreatedById == user.Id, "Dt");
+                //var beflist = _businessWorkDiary.GetList(null, out int beftotalCount, x => x.Dt >= begDate && x.Dt <= begDate.AddMonths(1).AddDays(-1) && x.CreatedById == user.Id, "Dt");
 
-                var befesult = beflist.ToList();
+                //var befesult = beflist.ToList();
 
-                _businessWorkDiary.AddDefaultItemWhenNotexist(befesult, begDate);//检查并新增空默认行项
+                //_businessWorkDiary.AddDefaultItemWhenNotexist(befesult, begDate);//检查并新增空默认行项
 
                 var aftlist = _businessWorkDiary.GetList(null, out int afttotalCount, x => x.Dt >= begDate && x.Dt <= begDate.AddMonths(1).AddDays(-1) && x.CreatedById == user.Id, "Dt");
 
