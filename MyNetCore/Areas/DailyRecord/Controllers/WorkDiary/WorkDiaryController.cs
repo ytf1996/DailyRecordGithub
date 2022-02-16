@@ -111,6 +111,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
 
                 list.Add(new DiarySummaryDto
                 {
+                    Id=user.Id,
                     UserOrder = user.UserOrder,
                     UserName = user.Name,
                     NormalWorkHourSummary = Math.Round(aftresult.Sum(x => x.NormalWorkHour ?? 0) / 8, 2),        //以人天计

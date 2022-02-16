@@ -273,6 +273,12 @@ namespace MyNetCore.Models
     public class DiarySummaryDto
     {
         /// <summary>
+        /// 人员ID
+        /// </summary>
+        [Display(Name = "人员ID")]
+        public int Id { get; set; }
+
+        /// <summary>
         /// 人员序号  （日志周报功能）
         /// </summary>
         [Display(Name = "人员序号")]
