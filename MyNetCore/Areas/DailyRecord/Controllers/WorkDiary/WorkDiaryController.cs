@@ -29,7 +29,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
 
         public IActionResult QueryUserInfoById(int userId)
         {
-            var userInfo = _businessUsers.GetList(null, out int userTotalCount, x => x.Id== userId, null, null, false).FirstOrDefault();
+            var userInfo = _businessUsers.GetList(null, out int userTotalCount, x => x.Id == userId, null, null, false).FirstOrDefault();
 
             return Success(data: userInfo);
         }
@@ -118,7 +118,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
 
                 list.Add(new DiarySummaryDto
                 {
-                    Id=user.Id,
+                    Id = user.Id,
                     UserOrder = user.UserOrder,
                     UserName = user.Name,
                     NormalWorkHourSummary = Math.Round(aftresult.Sum(x => x.NormalWorkHour ?? 0) / 8, 2),        //以人天计
@@ -201,7 +201,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 throw new Exception("您无此操作权限");
             }
 
-            var userExpList = _businessUsers.GetList(null, out int userTotalCount, x => x.ContractedSupplier == contractedSupplier&& x.IfExport == 1 && !x.Disabled, "UserOrder", null, false).ToList();
+            var userExpList = _businessUsers.GetList(null, out int userTotalCount, x => x.ContractedSupplier == contractedSupplier && x.IfExport == 1 && !x.Disabled, "UserOrder", null, false).ToList();
             var userAccounts = userExpList.Select(x => (int?)x.Id).ToList();
             var allWorkDiaryList = _businessWorkDiary.GetList(null, out int totalCount, x => userAccounts.Contains(x.CreatedById) && x.Dt >= yearMonth && x.Dt <= yearMonth.AddMonths(1).AddDays(-1), "Dt");
             var hasWorkDiaryAcconts = allWorkDiaryList.Select(x => x.CreatedById).Distinct().ToList();
@@ -345,6 +345,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 downLoadWorkBook.Write(stream);
             }
             downLoadWorkBook.Close();
+            #endregion
 
             return exportExcelName;
         }
@@ -361,7 +362,6 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 stream.Read(excelBuffer, 0, excelBuffer.Length);
             }
             var base64CodeStr = Convert.ToBase64String(excelBuffer);
-            #endregion
 
             return Success(data: base64CodeStr);
         }
@@ -375,6 +375,177 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
 
             return Success(data: excelIpPort + System.Web.HttpUtility.UrlEncode(subPath.Replace("\\", "/")));
         }
+
+
+        public IActionResult ExportDailyReport_New(DateTime yearMonth, string contractedSupplier)
+        {
+            yearMonth = new DateTime(yearMonth.Year, yearMonth.Month, 1);
+
+            var currentUser = GetCurrentUserInfo();
+            if (currentUser == null)
+            {
+                throw new Exception("用户未登录");
+            }
+            if (!currentUser.IsAdmin)
+            {
+                throw new Exception("您无此操作权限");
+            }
+
+            var userExpList = _businessUsers.GetList(null, out int userTotalCount, x => x.ContractedSupplier == contractedSupplier && x.IfExport == 1 && !x.Disabled, "UserOrder", null, false).ToList();
+            var userAccounts = userExpList.Select(x => (int?)x.Id).ToList();
+            var allWorkDiaryList = _businessWorkDiary.GetList(null, out int totalCount, x => userAccounts.Contains(x.CreatedById) && x.Dt >= yearMonth && x.Dt <= yearMonth.AddMonths(1).AddDays(-1), "Dt");
+            var hasWorkDiaryAcconts = allWorkDiaryList.Select(x => x.CreatedById).Distinct().ToList();
+            userExpList = userExpList.Where(x => hasWorkDiaryAcconts.Contains(x.Id)).ToList();
+            userAccounts = userExpList.Select(x => (int?)x.Id).ToList();
+
+            var sheetNames = userExpList.Select(x => x.Name).ToList();
+            var excelName = contractedSupplier + yearMonth.ToString("yyyyMM") + "日报";
+            string path = AppContext.BaseDirectory + @"Excel\";  // @"C:\Users\16273\Desktop\DailyRecord\MyNetCore\";   //return path;
+
+            #region 创建工作簿、克隆sheet页、获取特定单元格位置、赋值单元格日志值
+            XSSFWorkbook workbookTemplate;
+            XSSFSheet sheetTemplate;
+            string templateExcelName = path + "日志导出模板.xlsx";
+            Dictionary<string, (int, int)> dic = new Dictionary<string, (int, int)>();
+            List<string> speCellNameList_user = new List<string>{
+                nameof(Users.ContractedSupplier),
+                nameof(Users.Group),
+                nameof(Users.ServiceUnit),
+                nameof(Users.Name),
+                nameof(Users.CounselorPropertyDes),
+            };
+            List<string> speCellNameList_diary = new List<string>{
+                nameof(WorkDiaryInfo.DtExport),
+                nameof(WorkDiaryInfo.WhatDayDes),
+                nameof(WorkDiaryInfo.WhetherOnBusinessTripExport),
+                nameof(WorkDiaryInfo.TravelSite),
+                nameof(WorkDiaryInfo.JobClassificationInfoIdExport),
+                nameof(WorkDiaryInfo.JobContent),
+                nameof(WorkDiaryInfo.BegWorkTimeExport),
+                nameof(WorkDiaryInfo.EndWorkTimeExport),
+                nameof(WorkDiaryInfo.NormalWorkHour),
+                nameof(WorkDiaryInfo.ExtraWorkHour),
+                nameof(WorkDiaryInfo.SubtotalWorkHour),
+                nameof(WorkDiaryInfo.Remark)
+            };
+            List<string> speCellNameList_summary = new List<string>{
+                "yyyyMM",
+                "ChargeDayNum",
+                "BisTripDayNum"
+            };
+            using (FileStream stream = new FileStream(templateExcelName, FileMode.Open, FileAccess.Read))
+            {
+                workbookTemplate = new XSSFWorkbook(stream);
+                sheetTemplate = workbookTemplate.GetSheet("XXX") as XSSFSheet;
+                //遍历模板excel获得行号列号
+                for (var i = 0; i <= sheetTemplate.LastRowNum; i++)  //46行   LastRowNum=45
+                {
+                    XSSFRow row = (XSSFRow)sheetTemplate.GetRow(i);
+                    for (int j = 0; j < (row.LastCellNum); j++) //12列    LastCellNum=12
+                    {
+                        XSSFCell cell = (XSSFCell)row.GetCell(j);
+
+                        if (speCellNameList_user.Contains(cell.ToString()) || speCellNameList_diary.Contains(cell.ToString()) || speCellNameList_summary.Contains(cell.ToString()))
+                        {
+                            dic.Add(cell.ToString(), (i, j));
+                        }
+                    }
+                }
+            }
+
+            XSSFWorkbook downLoadWorkBook = new XSSFWorkbook();
+            foreach (var sheetName in sheetNames)
+            {
+                sheetTemplate.CopyTo(downLoadWorkBook, sheetName, true, true);
+            }
+            workbookTemplate.Close();
+
+            var exportExcelName = path + excelName + ".xlsx";
+            PropertyInfo[] propertyInfos_user = typeof(Users).GetProperties();
+            PropertyInfo[] propertyInfos_diary = typeof(WorkDiaryInfo).GetProperties();
+            WorkDiaryInfo.projectList = new BusinessJobClassification().GetList(null, out _, null).ToList();
+            using (FileStream stream = new FileStream(exportExcelName, FileMode.Create, FileAccess.Write))  // If the file already exists, it will be overwritten. 
+            {
+                foreach (var userId in userAccounts)  //对每个用户循环处理
+                {
+                    var userInfo = userExpList.Where(x => x.Id == userId).FirstOrDefault();
+                    XSSFSheet curUserSheet = (XSSFSheet)downLoadWorkBook.GetSheet(userInfo.Name); //获取该用户对应的sheet页
+
+                    speCellNameList_user.ForEach(cellName =>
+                    {
+                        ICell cell = curUserSheet.GetRow(dic[cellName].Item1).GetCell(dic[cellName].Item2);
+
+                        var propertyInfo = propertyInfos_user.Where(y => y.Name == cellName).FirstOrDefault();
+
+                        cell.SetCellValue(propertyInfo.GetValue(userInfo)?.ToString());
+                    });
+
+                    var curUserWorkDiaryList = allWorkDiaryList.Where(x => x.CreatedById == userId).OrderBy(x => x.Dt).ToList();
+                    speCellNameList_diary.ForEach(cellName =>
+                    {
+                        var propertyInfo = propertyInfos_diary.Where(y => y.Name == cellName).FirstOrDefault();
+                        var x = dic[cellName].Item1; var y = dic[cellName].Item2;
+
+                        curUserWorkDiaryList.ForEach(userDiary =>
+                        {
+                            ICell cell = curUserSheet.GetRow(x++).GetCell(y);
+
+                            if (cellName == nameof(WorkDiaryInfo.NormalWorkHour) || cellName == nameof(WorkDiaryInfo.ExtraWorkHour) || cellName == nameof(WorkDiaryInfo.SubtotalWorkHour))
+                            {
+                                var val = propertyInfo.GetValue(userDiary);
+                                if (val != null)
+                                {
+                                    cell.SetCellValue((double)val);
+                                }
+                                else
+                                {
+                                    cell.SetCellValue((string)null);
+                                }
+                            }
+                            else
+                            {
+                                cell.SetCellValue(propertyInfo.GetValue(userDiary)?.ToString());
+                            }
+                        });
+                    });
+
+                    speCellNameList_summary.ForEach(cellName =>
+                    {
+                        ICell cell = curUserSheet.GetRow(dic[cellName].Item1).GetCell(dic[cellName].Item2);
+
+                        switch (cellName)
+                        {
+                            case "yyyyMM":
+                                string valyyyyMM = yearMonth.ToString("yyyy/MM");
+                                cell.SetCellValue(valyyyyMM);
+                                break;
+                            case "ChargeDayNum":
+                                double valChargeDayNum = curUserWorkDiaryList.Where(x => x.SubtotalWorkHour != null && x.SubtotalWorkHour != 0).Count();
+                                cell.SetCellValue(valChargeDayNum);
+                                break;
+                            case "BisTripDayNum":
+                                double valBisTripDayNum = curUserWorkDiaryList.Where(x => x.SubtotalWorkHour != null && x.SubtotalWorkHour != 0 && (x.WhetherOnBusinessTrip ?? false)).Count();
+                                cell.SetCellValue(valBisTripDayNum);
+                                break;
+                            default:
+                                break;
+                        }
+                    });
+                }
+                downLoadWorkBook.Write(stream);
+            }
+            downLoadWorkBook.Close();
+            #endregion
+
+            FileStream sr = new FileStream(exportExcelName, FileMode.Open);
+
+            if (sr == null)
+                return NotFound();
+
+            return File(sr, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", excelName + ".xlsx");
+        }
+
+
 
         /// <summary>
         /// 获取本机IP
