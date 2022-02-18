@@ -376,7 +376,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
             return Success(data: excelIpPort + System.Web.HttpUtility.UrlEncode(subPath.Replace("\\", "/")));
         }
 
-
+        //http://localhost:6789/DailyRecord/WorkDiary/ExportDailyReport_New?yearMonth=2022-02-01&contractedSupplier=%E7%BD%91%E6%96%B0
         public IActionResult ExportDailyReport_New(DateTime yearMonth, string contractedSupplier)
         {
             yearMonth = new DateTime(yearMonth.Year, yearMonth.Month, 1);

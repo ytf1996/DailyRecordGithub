@@ -70,7 +70,7 @@ namespace MyNetCore.Business
             if (!string.IsNullOrWhiteSpace(accessToken))
             {
                 var apiUserModel = DB.AccessToken.Include(m => m.CurrentUser).AsNoTracking().FirstOrDefault(m => m.Deleted == false && m.Name == accessToken);
-                if (apiUserModel != null && apiUserModel.EffectDateTime >= DateTime.Now && apiUserModel.CurrentUser != null)
+                if (apiUserModel != null/* && apiUserModel.EffectDateTime >= DateTime.Now*/ && apiUserModel.CurrentUser != null)
                 {
                     currentUser = apiUserModel.CurrentUser;
                     apiUserModel.EffectDateTime = DateTime.Now.AddHours(24); //DateTime.Now.AddMinutes(ApiUserEffectMinutes);

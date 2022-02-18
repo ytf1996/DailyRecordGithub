@@ -59,7 +59,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 accessToken.EffectDateTime = DateTime.Now.AddHours(24);
                 businessAccessToken.Add(accessToken, false);
             }
-            else if (DateTime.Now.AddMinutes(10) >= accessToken.EffectDateTime)
+            else //if (DateTime.Now.AddMinutes(10) >= accessToken.EffectDateTime)
             {
                 accessToken.EffectDateTime = DateTime.Now.AddHours(24);
                 businessAccessToken.Edit(accessToken, false);
