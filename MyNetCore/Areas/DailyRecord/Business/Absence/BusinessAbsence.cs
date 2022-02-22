@@ -28,7 +28,7 @@ namespace MyNetCore.Business
 
         public void CheckRepeat(DateTime begDate, DateTime endDate, Users currentUser, bool isUpdate = false, int updatedId = 0)
         {
-            var list = GetList(null, out int beftotalCount, x => (x.BegAbsenceTime > endDate || x.EndAbsenceTime < begDate) && x.CreatedById == currentUser.Id);   //这里不要带等于
+            var list = GetList(null, out int beftotalCount, x => !(x.BegAbsenceTime >= endDate || x.EndAbsenceTime <= begDate) && x.CreatedById == currentUser.Id);   //这里不要带等于
 
             if (isUpdate)
             {
