@@ -180,6 +180,11 @@ namespace MyNetCore.Models
         /// 项目类别
         /// </summary>
         public DbSet<ProjectClassificationInfo> ProjectClassificationInfo { get; set; }
+
+        /// <summary>
+        /// 请假管理
+        /// </summary>
+        public DbSet<AbsenceInfo> AbsenceInfo { get; set; }
         #endregion
     }
 }
