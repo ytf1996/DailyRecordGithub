@@ -583,6 +583,17 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 throw new Exception("非管理员没有权限修改他人的记录");
             }
 
+            //这里判断要使用  workDiaryInfo.JobContent   和   workDiaryInfoDB.Dt     
+            if (string.IsNullOrWhiteSpace(workDiaryInfo.JobContent) && workDiaryInfoDB.Dt <= DateTime.Today) //将服务器当前日期及之前工作内容为空的行项 打卡相关字段 置空
+            {
+                workDiaryInfo.JobContent = null;
+                workDiaryInfo.BegWorkTime = null;
+                workDiaryInfo.EndWorkTime = null;
+                workDiaryInfo.NormalWorkHour = null;
+                workDiaryInfo.ExtraWorkHour = null;
+                workDiaryInfo.SubtotalWorkHour = 0;
+            }
+
             workDiaryInfoDB.WhetherOnBusinessTrip = workDiaryInfo.WhetherOnBusinessTrip;
             workDiaryInfoDB.TravelSite = workDiaryInfo.TravelSite;
             workDiaryInfoDB.JobClassificationInfoId = workDiaryInfo.JobClassificationInfoId;
