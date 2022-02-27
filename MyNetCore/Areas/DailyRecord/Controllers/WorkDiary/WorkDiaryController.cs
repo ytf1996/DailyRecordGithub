@@ -583,20 +583,23 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 throw new Exception("非管理员没有权限修改他人的记录");
             }
 
-            if (string.IsNullOrWhiteSpace(workDiaryInfo.JobContent))
+            if(workDiaryInfoDB.Dt <= DateTime.Today)
             {
-                if (workDiaryInfo.NormalWorkHour != null || workDiaryInfo.ExtraWorkHour != null || workDiaryInfo.BegWorkTime != null || workDiaryInfo.EndWorkTime != null)
+                if (string.IsNullOrWhiteSpace(workDiaryInfo.JobContent))
                 {
-                    throw new Exception("上下班时间、时长、工作内容  需要同时填写或不填写");
+                    if (workDiaryInfo.NormalWorkHour != null || workDiaryInfo.ExtraWorkHour != null || workDiaryInfo.BegWorkTime != null || workDiaryInfo.EndWorkTime != null)
+                    {
+                        throw new Exception("上下班时间、时长、工作内容  需要同时填写或不填写");
+                    }
                 }
-            }
-            else
-            {
-                if ((workDiaryInfo.NormalWorkHour == null && workDiaryInfo.ExtraWorkHour == null) || workDiaryInfo.BegWorkTime == null || workDiaryInfo.EndWorkTime == null)
+                else
                 {
-                    throw new Exception("上下班时间、时长、工作内容  需要同时填写或不填写");
+                    if ((workDiaryInfo.NormalWorkHour == null && workDiaryInfo.ExtraWorkHour == null) || workDiaryInfo.BegWorkTime == null || workDiaryInfo.EndWorkTime == null)
+                    {
+                        throw new Exception("上下班时间、时长、工作内容  需要同时填写或不填写");
+                    }
                 }
-            }
+            }           
 
             workDiaryInfoDB.WhetherOnBusinessTrip = workDiaryInfo.WhetherOnBusinessTrip;
             workDiaryInfoDB.TravelSite = workDiaryInfo.TravelSite;
