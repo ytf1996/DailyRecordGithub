@@ -122,7 +122,8 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                     UserOrder = user.UserOrder,
                     UserName = user.Name,
                     NormalWorkHourSummary = Math.Round(aftresult.Sum(x => x.NormalWorkHour ?? 0) / 8, 2),        //以人天计
-                    ExtraWorkHourSummary = Math.Round(aftresult.Sum(x => x.ExtraWorkHour ?? 0) / 8, 2)
+                    ExtraWorkHourSummary = Math.Round(aftresult.Sum(x => x.ExtraWorkHour ?? 0) / 8, 2),
+                    SubtotalWorkHourSummary = Math.Round(aftresult.Sum(x => x.NormalWorkHour ?? 0) / 8+ aftresult.Sum(x => x.ExtraWorkHour ?? 0) / 8,2)
                 });
             });
 

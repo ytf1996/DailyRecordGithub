@@ -34,7 +34,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 throw new Exception("请填写正确的查询开始和结束时间");
             }
 
-            var list = _businessAbsence.GetList(null, out int totalCount, x => x.BegAbsenceTime >= begDate && x.EndAbsenceTime <= endDate && x.CreatedById == currentUser.Id);
+            var list = _businessAbsence.GetList(null, out int totalCount, x => x.BegAbsenceTime.Date >= begDate.Date && x.EndAbsenceTime.Date <= endDate.Date && x.CreatedById == currentUser.Id);
             if (isOnlyNotDealed)
             {
                 list = list.Where(x => x.WhetherApprove == null);
@@ -67,7 +67,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 throw new Exception("请填写正确的查询开始和结束时间");
             }
 
-            var list = _businessAbsence.GetList(null, out int totalCount, x => x.BegAbsenceTime >= begDate && x.EndAbsenceTime <= endDate);
+            var list = _businessAbsence.GetList(null, out int totalCount, x => x.BegAbsenceTime.Date >= begDate.Date && x.EndAbsenceTime.Date <= endDate.Date);
             if (isOnlyNotDealed)
             {
                 list = list.Where(x => x.WhetherApprove == null);

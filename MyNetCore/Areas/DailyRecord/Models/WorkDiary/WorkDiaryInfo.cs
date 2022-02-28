@@ -303,6 +303,6 @@ namespace MyNetCore.Models
         /// <summary>
         /// 合计工作工时
         /// </summary>
-        public virtual double? SubtotalWorkHourSummary => NormalWorkHourSummary + ExtraWorkHourSummary;
+        public virtual double? SubtotalWorkHourSummary { get; set; }
     }
 }
