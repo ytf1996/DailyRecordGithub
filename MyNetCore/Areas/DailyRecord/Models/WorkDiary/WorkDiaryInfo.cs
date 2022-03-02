@@ -96,11 +96,18 @@ namespace MyNetCore.Models
         public virtual double? SubtotalWorkHour { get; set; }
 
         /// <summary>
+        /// 是否收费
+        /// </summary>
+        [Display(Name = "是否收费")]
+        //[CustomColumn(isRequired: true)]
+        public virtual string IsCharged => "Yes";
+
+        /// <summary>
         /// 备注
         /// </summary>
         [MaxLength(4000)]
         [Display(Name = "备注")]
-        public virtual string Remark { get; set; }
+        public virtual string RemarkContent { get; set; }
 
 
         #region 非DB   （用于日报导出）

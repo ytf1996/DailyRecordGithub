@@ -337,24 +337,25 @@ namespace MyNetCore.Models
     }
 
 
+    //10开发    20测试    30实施
     public enum CounselorProperty
     {
         /// <summary>
-        /// 开发工程师
+        /// 实施
         /// </summary>
-        [Display(Name = "开发工程师")]
+        [Display(Name = "实施")]
         DevelopmentEngineer = 10,
 
         /// <summary>
-        /// 测试工程师
+        /// 实施
         /// </summary>
-        [Display(Name = "测试工程师")]
+        [Display(Name = "实施")]
         TestEngineer = 20,
 
         /// <summary>
-        /// 实施工程师
+        /// 实施
         /// </summary>
-        [Display(Name = "实施工程师")]
+        [Display(Name = "实施")]
         ImplementationEngineer = 30
     }
 

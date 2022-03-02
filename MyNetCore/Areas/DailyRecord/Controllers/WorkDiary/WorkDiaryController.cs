@@ -243,7 +243,8 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 nameof(WorkDiaryInfo.NormalWorkHour),
                 nameof(WorkDiaryInfo.ExtraWorkHour),
                 nameof(WorkDiaryInfo.SubtotalWorkHour),
-                nameof(WorkDiaryInfo.Remark)
+                nameof(WorkDiaryInfo.IsCharged),
+                nameof(WorkDiaryInfo.RemarkContent)
             };
             List<string> speCellNameList_summary = new List<string>{
                 "yyyyMM",
@@ -400,7 +401,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
 
             var userExpList = _businessUsers.GetList(null, out int userTotalCount, x => x.ContractedSupplier == contractedSupplier && x.IfExport == 1 && !x.Disabled, "UserOrder", null, false).ToList();
             var userAccounts = userExpList.Select(x => (int?)x.Id).ToList();
-            var allWorkDiaryList = _businessWorkDiary.GetList(null, out int totalCount, x => userAccounts.Contains(x.CreatedById) && x.Dt >= yearMonth && x.Dt <= yearMonth.AddMonths(1).AddDays(-1), "Dt");
+            var allWorkDiaryList = _businessWorkDiary.GetList(null, out int totalCount, x => !string.IsNullOrWhiteSpace(x.JobContent) && userAccounts.Contains(x.CreatedById) && x.Dt >= yearMonth && x.Dt <= yearMonth.AddMonths(1).AddDays(-1), "Dt");
             var hasWorkDiaryAcconts = allWorkDiaryList.Select(x => x.CreatedById).Distinct().ToList();
             userExpList = userExpList.Where(x => hasWorkDiaryAcconts.Contains(x.Id)).ToList();
             userAccounts = userExpList.Select(x => (int?)x.Id).ToList();
@@ -433,7 +434,8 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 nameof(WorkDiaryInfo.NormalWorkHour),
                 nameof(WorkDiaryInfo.ExtraWorkHour),
                 nameof(WorkDiaryInfo.SubtotalWorkHour),
-                nameof(WorkDiaryInfo.Remark)
+                nameof(WorkDiaryInfo.IsCharged),
+                nameof(WorkDiaryInfo.RemarkContent)
             };
             List<string> speCellNameList_summary = new List<string>{
                 "yyyyMM",
@@ -617,7 +619,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
             workDiaryInfoDB.NormalWorkHour = workDiaryInfo.NormalWorkHour;
             workDiaryInfoDB.ExtraWorkHour = workDiaryInfo.ExtraWorkHour;
             workDiaryInfoDB.SubtotalWorkHour = Math.Round((((workDiaryInfoDB.NormalWorkHour ?? 0) + (workDiaryInfoDB.ExtraWorkHour ?? 0)) / 8), 2);
-            workDiaryInfoDB.Remark = workDiaryInfo.Remark;
+            workDiaryInfoDB.RemarkContent = workDiaryInfo.RemarkContent;
 
             if ((workDiaryInfoDB.BegWorkTime == null && workDiaryInfoDB.EndWorkTime != null) || (workDiaryInfoDB.BegWorkTime != null && workDiaryInfoDB.EndWorkTime == null))
             {
