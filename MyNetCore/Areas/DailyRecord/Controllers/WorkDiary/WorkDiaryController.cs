@@ -529,7 +529,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                                 cell.SetCellValue(valyyyyMM);
                                 break;
                             case "ChargeDayNum":
-                                double valChargeDayNum = curUserWorkDiaryList.Where(x => x.SubtotalWorkHour != null && x.SubtotalWorkHour != 0).Count();
+                                double valChargeDayNum = curUserWorkDiaryList.Sum(x => x.SubtotalWorkHour ?? 0);
                                 cell.SetCellValue(valChargeDayNum);
                                 break;
                             case "BisTripDayNum":
