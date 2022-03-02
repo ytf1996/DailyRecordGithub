@@ -304,5 +304,10 @@ namespace MyNetCore.Models
         /// 合计工作工时
         /// </summary>
         public virtual double? SubtotalWorkHourSummary { get; set; }
+
+        /// <summary>
+        /// 合计请假天数
+        /// </summary>
+        public virtual double? SubtotalAbsenceDaySummary { get; set; }
     }
 }

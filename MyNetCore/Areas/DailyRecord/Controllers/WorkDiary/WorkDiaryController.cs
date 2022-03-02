@@ -16,6 +16,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
     {
         private BusinessWorkDiary _businessWorkDiary = new BusinessWorkDiary();
         private BusinessUsers _businessUsers = new BusinessUsers();
+        private BusinessAbsence _businessAbsence = new BusinessAbsence();
 
         public IActionResult QueryCurrentUserInfo()
         {
@@ -113,8 +114,12 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 //_businessWorkDiary.AddDefaultItemWhenNotexist(befesult, begDate);//检查并新增空默认行项
 
                 var aftlist = _businessWorkDiary.GetList(null, out int afttotalCount, x => x.Dt >= begDate && x.Dt <= begDate.AddMonths(1).AddDays(-1) && x.CreatedById == user.Id, "Dt");
-
                 var aftresult = aftlist.ToList();
+
+                //以统计2月份的请假来算
+                //请假开始时间<3.1 0:0   && 请假结束时间>2.1 0:0      (则算入当前月份请假部分)    【跨月的两边都显示即可】
+                var absencelist = _businessAbsence.GetList(null, out int totalCount, x => !(x.BegAbsenceTime >= begDate.AddMonths(1) || x.EndAbsenceTime <= begDate) && x.CreatedById == user.Id);
+                var absenceResult = absencelist.ToList();
 
                 list.Add(new DiarySummaryDto
                 {
@@ -123,7 +128,8 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                     UserName = user.Name,
                     NormalWorkHourSummary = Math.Round(aftresult.Sum(x => x.NormalWorkHour ?? 0) / 8, 2),        //以人天计
                     ExtraWorkHourSummary = Math.Round(aftresult.Sum(x => x.ExtraWorkHour ?? 0) / 8, 2),
-                    SubtotalWorkHourSummary = Math.Round(aftresult.Sum(x => x.NormalWorkHour ?? 0) / 8+ aftresult.Sum(x => x.ExtraWorkHour ?? 0) / 8,2)
+                    SubtotalWorkHourSummary = Math.Round(aftresult.Sum(x => x.NormalWorkHour ?? 0) / 8 + aftresult.Sum(x => x.ExtraWorkHour ?? 0) / 8, 2),
+                    SubtotalAbsenceDaySummary = Math.Round(absenceResult.Sum(x => x.AbsenceHours) / 8, 2),
                 });
             });
 
@@ -204,7 +210,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
 
             var userExpList = _businessUsers.GetList(null, out int userTotalCount, x => x.ContractedSupplier == contractedSupplier && x.IfExport == 1 && !x.Disabled, "UserOrder", null, false).ToList();
             var userAccounts = userExpList.Select(x => (int?)x.Id).ToList();
-            var allWorkDiaryList = _businessWorkDiary.GetList(null, out int totalCount, x =>!string.IsNullOrWhiteSpace(x.JobContent)&& userAccounts.Contains(x.CreatedById) && x.Dt >= yearMonth && x.Dt <= yearMonth.AddMonths(1).AddDays(-1), "Dt");
+            var allWorkDiaryList = _businessWorkDiary.GetList(null, out int totalCount, x => !string.IsNullOrWhiteSpace(x.JobContent) && userAccounts.Contains(x.CreatedById) && x.Dt >= yearMonth && x.Dt <= yearMonth.AddMonths(1).AddDays(-1), "Dt");
             var hasWorkDiaryAcconts = allWorkDiaryList.Select(x => x.CreatedById).Distinct().ToList();
             userExpList = userExpList.Where(x => hasWorkDiaryAcconts.Contains(x.Id)).ToList();
             userAccounts = userExpList.Select(x => (int?)x.Id).ToList();
@@ -584,7 +590,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 throw new Exception("非管理员没有权限修改他人的记录");
             }
 
-            if(workDiaryInfoDB.Dt <= DateTime.Today)
+            if (workDiaryInfoDB.Dt <= DateTime.Today)
             {
                 if (string.IsNullOrWhiteSpace(workDiaryInfo.JobContent))
                 {
@@ -600,7 +606,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                         throw new Exception("上下班时间、时长、工作内容  需要同时填写或不填写");
                     }
                 }
-            }           
+            }
 
             workDiaryInfoDB.WhetherOnBusinessTrip = workDiaryInfo.WhetherOnBusinessTrip;
             workDiaryInfoDB.TravelSite = workDiaryInfo.TravelSite;
