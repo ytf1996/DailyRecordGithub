@@ -138,7 +138,8 @@ namespace MyNetCore.Areas.Management.Controllers
                          ChannelId = m.ChannelsName,
                          TerritoryId = GetTerrByTerrId(m.TerritoryId).Name,
                          Gender = m.Gender.GetCustomDescription(),
-                         TerritoryProfilesId = GetTerritoryProfilesByProfileId(m.TerritoryProfilesId).Name
+                         TerritoryProfilesId = GetTerritoryProfilesByProfileId(m.TerritoryProfilesId).Name,
+                         m.IfExport
                      };
 
             return JsonListResult(param, total, result);
