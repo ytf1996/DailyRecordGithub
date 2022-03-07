@@ -592,7 +592,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 throw new Exception("非管理员没有权限修改他人的记录");
             }
 
-            if (workDiaryInfoDB.Dt <= DateTime.Today)
+            if (workDiaryInfoDB.Dt < DateTime.Today)
             {
                 if (string.IsNullOrWhiteSpace(workDiaryInfo.JobContent))
                 {
