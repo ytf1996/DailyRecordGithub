@@ -156,13 +156,13 @@ namespace MyNetCore.Models
         /// 上班时间
         /// </summary>
         [NotMapped]
-        public virtual string BegWorkTimeExport => BegWorkTime?.ToString("hh:mm");
+        public virtual string BegWorkTimeExport => BegWorkTime?.Hour.ToString()?.PadLeft(2,'0')+":"+ BegWorkTime?.Minute.ToString()?.PadLeft(2, '0');
 
         /// <summary>
         /// 下班时间
         /// </summary>
         [NotMapped]
-        public virtual string EndWorkTimeExport => EndWorkTime?.ToString("hh:mm");
+        public virtual string EndWorkTimeExport => EndWorkTime?.Hour.ToString()?.PadLeft(2, '0') + ":" + EndWorkTime?.Minute.ToString()?.PadLeft(2, '0');
         #endregion
     }
 
