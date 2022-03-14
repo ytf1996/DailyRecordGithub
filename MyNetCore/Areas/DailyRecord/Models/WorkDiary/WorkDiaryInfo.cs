@@ -145,7 +145,7 @@ namespace MyNetCore.Models
         /// 是否出差
         /// </summary>
         [NotMapped]
-        public virtual string WhetherOnBusinessTripExport => WhetherOnBusinessTrip ?? false ? "No" : "Yes";
+        public virtual string WhetherOnBusinessTripExport => (WhetherOnBusinessTrip==false || WhetherOnBusinessTrip==null) ? "No" : "Yes";
 
         /// <summary>
         /// 工作分类信息Id
