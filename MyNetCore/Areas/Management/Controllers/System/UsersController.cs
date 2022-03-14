@@ -139,7 +139,7 @@ namespace MyNetCore.Areas.Management.Controllers
                          TerritoryId = GetTerrByTerrId(m.TerritoryId).Name,
                          Gender = m.Gender.GetCustomDescription(),
                          TerritoryProfilesId = GetTerritoryProfilesByProfileId(m.TerritoryProfilesId).Name,
-                         m.IfExport
+                         m.IfLeave
                      };
 
             return JsonListResult(param, total, result);

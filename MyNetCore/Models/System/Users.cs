@@ -216,12 +216,9 @@ namespace MyNetCore.Models
         public string Duty { get; set; }
 
         /// <summary>
-        /// 是否导出（日报、周报）  // 1导出      0不导出
+        ///  是否离职
         /// </summary>
-        public int IfExport { get; set; }
-
-
-
+        public int IfLeave { get; set; }
 
         #region 非DB
         [NotMapped]

@@ -59,7 +59,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
 
             var dataList = _businessPlanNextWeek.GetList(null, out int beftotalCount, x => x.BegDate >= begDate && x.BegDate <= endDate && x.CreatedById == currentUser.Id).ToList();
 
-            for (var dt = endDate; dt >=begDate ; dt = dt.AddDays(-1))
+            for (var dt = endDate; dt >= begDate; dt = dt.AddDays(-1))
             {
                 var dataList_dt = dataList.Where(x => x.BegDate == dt).ToList();
                 if (dataList_dt.Count == 0) continue;
@@ -73,7 +73,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 });
                 table.Rows.Add(dr);
             }
-             
+
             rtnDto.WeeklyData = table;
 
             return Success(data: rtnDto.ToJsonString());
@@ -120,12 +120,15 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 table.Columns.Add(x.ProjectClassificationInfoId.ToString(), typeof(string));
             });
 
-            var userExpList = _businessUsers.GetList(null, out int userTotalCount, x => x.IfExport == 1 && !x.Disabled, "UserOrder", null, false).ToList();
+            var userExpList = _businessUsers.GetList(null, out int userTotalCount, x => /*x.IfLeave == 1 &&*/ !x.Disabled, "UserOrder", null, false).ToList();
+
             var users = userExpList.Select(_ =>
-            new {
+            new
+            {
+                IfLeave = _.IfLeave,
                 UserId = _.Id,
                 Company = _.ContractedSupplier,
-                Duty = _.Duty ,
+                Duty = _.Duty,
                 UserName = _.Name,
                 UserOrder = _.UserOrder
             }
@@ -137,6 +140,11 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
             foreach (var item in users)
             {
                 var row = dataList.Where(_ => _.CreatedById == item.UserId).ToList();
+
+                if (item.IfLeave == 0 && row.Count == 0)
+                {
+                    continue;  //如果离职了且无该周计划，则跳过
+                }
                 DataRow dr = table.NewRow();
                 dr["userOrder"] = item.UserOrder;
                 dr["company"] = item.Company;
@@ -208,12 +216,12 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 //{
                 //    throw new LogicException("工作计划安排内容不能为空");
                 //}
-                planDto.BegDate= new DateTime(planDto.BegDate.Year, planDto.BegDate.Month, planDto.BegDate.Day);
+                planDto.BegDate = new DateTime(planDto.BegDate.Year, planDto.BegDate.Month, planDto.BegDate.Day);
                 _businessPlanNextWeek.CheckRepeat(planDto.BegDate, Convert.ToInt32(item.ProjectClassificationInfoId), currentUser);
                 var pPlanNextWeekInfo = new PlanNextWeekInfo
                 {
                     BegDate = planDto.BegDate,
-                    ProjectClassificationInfoId =Convert.ToInt32(item.ProjectClassificationInfoId),
+                    ProjectClassificationInfoId = Convert.ToInt32(item.ProjectClassificationInfoId),
                     JobContent = item.JobContent
                 };
 
@@ -251,7 +259,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 pPlanNextWeekInfo.BegDate = new DateTime(pPlanNextWeekInfo.BegDate.Year, pPlanNextWeekInfo.BegDate.Month, pPlanNextWeekInfo.BegDate.Day);
                 //_businessPlanNextWeek.CheckDate(pPlanNextWeekInfo.BegDate);
 
-                _businessPlanNextWeek.CheckRepeat(pPlanNextWeekInfo.BegDate, pPlanNextWeekInfo.ProjectClassificationInfoId, currentUser,isUpdate:true, pPlanNextWeekInfo.Id);
+                _businessPlanNextWeek.CheckRepeat(pPlanNextWeekInfo.BegDate, pPlanNextWeekInfo.ProjectClassificationInfoId, currentUser, isUpdate: true, pPlanNextWeekInfo.Id);
 
                 pPlanNextWeekInfoDB.BegDate = pPlanNextWeekInfo.BegDate;
                 //pPlanNextWeekInfoDB.ProjectClassificationInfoId = pPlanNextWeekInfo.ProjectClassificationInfoId;
