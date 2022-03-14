@@ -52,7 +52,7 @@ namespace MyNetCore.Business
                     {
                         Dt = dt,
                         WhatDay = (int)dt.DayOfWeek,
-                        WhetherOnBusinessTrip = false,
+                        WhetherOnBusinessTrip = true,
                     };
                     if (isWorkDay)
                     {
