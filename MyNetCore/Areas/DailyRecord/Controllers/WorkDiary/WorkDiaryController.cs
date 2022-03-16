@@ -325,6 +325,10 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                                     cell.SetCellValue((string)null);
                                 }
                             }
+                            else if (cellName == nameof(WorkDiaryInfo.JobClassificationInfoIdExport))
+                            {
+                                cell.SetCellValue((string)null);
+                            }
                             else
                             {
                                 cell.SetCellValue(propertyInfo.GetValue(userDiary)?.ToString());
