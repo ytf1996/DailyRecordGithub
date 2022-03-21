@@ -257,36 +257,39 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                         JobContent = pPlanNextWeekInfo.JobContent
                     };
 
-                    _businessPlanNextWeek.Add(pPlanNextWeekInfo);  //若新增了项目，每次修改时，改为该条执行新增
+                    _businessPlanNextWeek.Add(pPlanNextWeekInfo_add);  //若新增了项目，每次修改时，改为该条执行新增
                     //throw new LogicException($"不存在主键id为{pPlanNextWeekInfo.Id}的下周计划记录");
                 }
-                if (!currentUser.IsAdmin && pPlanNextWeekInfoDB.CreatedById != currentUser.Id)
+                else
                 {
-                    throw new Exception("非管理员没有权限修改他人的记录");
+                    if (!currentUser.IsAdmin && pPlanNextWeekInfoDB.CreatedById != currentUser.Id)
+                    {
+                        throw new Exception("非管理员没有权限修改他人的记录");
+                    }
+                    pPlanNextWeekInfo.BegDate = new DateTime(pPlanNextWeekInfo.BegDate.Year, pPlanNextWeekInfo.BegDate.Month, pPlanNextWeekInfo.BegDate.Day);
+                    //_businessPlanNextWeek.CheckDate(pPlanNextWeekInfo.BegDate);
+
+                    _businessPlanNextWeek.CheckRepeat(pPlanNextWeekInfo.BegDate, pPlanNextWeekInfo.ProjectClassificationInfoId, currentUser, isUpdate: true, pPlanNextWeekInfo.Id);
+
+                    pPlanNextWeekInfoDB.BegDate = pPlanNextWeekInfo.BegDate;
+                    //pPlanNextWeekInfoDB.ProjectClassificationInfoId = pPlanNextWeekInfo.ProjectClassificationInfoId;
+                    pPlanNextWeekInfoDB.JobContent = pPlanNextWeekInfo.JobContent;
+
+                    //if (pPlanNextWeekInfoDB.BegDate == DateTime.MinValue)
+                    //{
+                    //    throw new LogicException("自然周日期不能为空");
+                    //}
+                    //if (pPlanNextWeekInfoDB.ProjectClassificationInfoId == 0)
+                    //{
+                    //    throw new LogicException("项目分类不能为空");
+                    //}
+                    //if (string.IsNullOrWhiteSpace(pPlanNextWeekInfoDB.JobContent))
+                    //{
+                    //    throw new LogicException("工作计划安排内容不能为空");
+                    //}
+
+                    _businessPlanNextWeek.Edit(pPlanNextWeekInfoDB);
                 }
-                pPlanNextWeekInfo.BegDate = new DateTime(pPlanNextWeekInfo.BegDate.Year, pPlanNextWeekInfo.BegDate.Month, pPlanNextWeekInfo.BegDate.Day);
-                //_businessPlanNextWeek.CheckDate(pPlanNextWeekInfo.BegDate);
-
-                _businessPlanNextWeek.CheckRepeat(pPlanNextWeekInfo.BegDate, pPlanNextWeekInfo.ProjectClassificationInfoId, currentUser, isUpdate: true, pPlanNextWeekInfo.Id);
-
-                pPlanNextWeekInfoDB.BegDate = pPlanNextWeekInfo.BegDate;
-                //pPlanNextWeekInfoDB.ProjectClassificationInfoId = pPlanNextWeekInfo.ProjectClassificationInfoId;
-                pPlanNextWeekInfoDB.JobContent = pPlanNextWeekInfo.JobContent;
-
-                //if (pPlanNextWeekInfoDB.BegDate == DateTime.MinValue)
-                //{
-                //    throw new LogicException("自然周日期不能为空");
-                //}
-                //if (pPlanNextWeekInfoDB.ProjectClassificationInfoId == 0)
-                //{
-                //    throw new LogicException("项目分类不能为空");
-                //}
-                //if (string.IsNullOrWhiteSpace(pPlanNextWeekInfoDB.JobContent))
-                //{
-                //    throw new LogicException("工作计划安排内容不能为空");
-                //}
-
-                _businessPlanNextWeek.Edit(pPlanNextWeekInfoDB);
             }
             return Success();
         }
