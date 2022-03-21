@@ -250,7 +250,15 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 var pPlanNextWeekInfoDB = _businessPlanNextWeek.GetById(pPlanNextWeekInfo.Id);
                 if (pPlanNextWeekInfoDB == null)
                 {
-                    throw new LogicException($"不存在主键id为{pPlanNextWeekInfo.Id}的下周计划记录");
+                    var pPlanNextWeekInfo_add = new PlanNextWeekInfo
+                    {
+                        BegDate = new DateTime(pPlanNextWeekInfo.BegDate.Year, pPlanNextWeekInfo.BegDate.Month, pPlanNextWeekInfo.BegDate.Day),
+                        ProjectClassificationInfoId = Convert.ToInt32(pPlanNextWeekInfo.ProjectClassificationInfoId),
+                        JobContent = pPlanNextWeekInfo.JobContent
+                    };
+
+                    _businessPlanNextWeek.Add(pPlanNextWeekInfo);  //若新增了项目，每次修改时，改为该条执行新增
+                    //throw new LogicException($"不存在主键id为{pPlanNextWeekInfo.Id}的下周计划记录");
                 }
                 if (!currentUser.IsAdmin && pPlanNextWeekInfoDB.CreatedById != currentUser.Id)
                 {
