@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MyNetCore.Business;
 using MyNetCore.Models;
+using Roim.Common;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -325,6 +326,92 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
             }
 
             return Success();
+        }
+
+
+
+        //用最少改动，不用管最优
+        public IActionResult ListExport(DateTime begDate, DateTime endDate)
+        {
+            begDate = new DateTime(begDate.Year, begDate.Month, begDate.Day);
+            endDate = new DateTime(endDate.Year, endDate.Month, endDate.Day);
+            if (begDate > endDate)
+            {
+                throw new Exception($"开始时间{begDate}大于结束时间{endDate}");
+            }
+
+            var currentUser = GetCurrentUserInfo();
+            if (currentUser == null)
+            {
+                throw new Exception("用户未登录");
+            }
+            if (!currentUser.IsAdmin)
+            {
+                throw new Exception("您无此操作权限");
+            }
+            //PlanShowDto rtnDto = new PlanShowDto();
+            var projectList = _businessProjectClassification.GetList(null, out int totalCount, null, "Order");
+            var WeeklyProjects = projectList.Select(x => x.ClassificationName).ToList();
+
+            DataTable table = new DataTable();
+           // table.Columns.Add("编号", typeof(string));
+            table.Columns.Add("公司", typeof(string));
+            table.Columns.Add("职责", typeof(string));
+            table.Columns.Add("工程师", typeof(string));
+
+            WeeklyProjects.ForEach(x =>
+            {
+                table.Columns.Add(x, typeof(string)); //直接用描述作为列名
+            });
+
+            var userExpList = _businessUsers.GetList(null, out int userTotalCount, x => /*x.IfLeave == 1 &&*/ !x.Disabled, "UserOrder", null, false).ToList();
+
+            var users = userExpList.Select(_ =>
+            new
+            {
+                IfLeave = _.IfLeave,
+                UserId = _.Id,
+                Company = _.ContractedSupplier,
+                Duty = _.Duty,
+                UserName = _.Name,
+                UserOrder = _.UserOrder
+            }
+            ).Distinct().OrderBy(_ => _.UserOrder).ToList();
+
+            //本周所有人的数据
+            var dataList = _businessPlanNextWeek.GetList(null, out int beftotalCount, x => x.BegDate >= begDate && x.BegDate <= endDate /*&& x.CreatedById == currentUser.Id*/).ToList();
+
+            foreach (var item in users)
+            {
+                var row = dataList.Where(_ => _.CreatedById == item.UserId).ToList();
+
+                if (item.IfLeave == 0 && row.Count == 0)
+                {
+                    continue;  //如果离职了且无该周计划，则跳过
+                }
+                DataRow dr = table.NewRow();
+               // dr["编号"] = item.UserOrder;
+                dr["公司"] = item.Company;
+                dr["职责"] = item.Duty;
+                dr["工程师"] = item.UserName;
+                WeeklyProjects.ForEach(project =>
+                {
+                    var pPlanNextWeekInfo = row?.Where(x => x.ProjectClassificationInfo.ClassificationName == project).FirstOrDefault();
+                    dr[project] = pPlanNextWeekInfo?.JobContent;
+                });
+                table.Rows.Add(dr);
+
+            }
+
+            string basePath = AppContext.BaseDirectory + @"Excel\";
+
+            string fromPath = basePath + "周报导出模板.xlsx";
+            var toPath = basePath + begDate.ToString("yyyyMMdd") + "-" + endDate.ToString("yyyyMMdd") + "周报.xlsx";
+
+            new ExcelHelper().WriteExcel_Dy(table, "sheet1", 2, 1, fromPath, toPath);
+
+
+            return Success(data: table.ToJsonString());//？？？
         }
     }
 }

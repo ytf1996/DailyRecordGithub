@@ -263,6 +263,161 @@ namespace Roim.Common
         }
 
         /// <summary>
+        /// 把DataTable写入Excel
+        /// </summary>
+        /// <param name="table">数据源</param>
+        /// <param name="sheetName">sheet名称</param>
+        /// <param name="rowBegin">开始行数</param>
+        /// <param name="columnBegin">开始列数</param>
+        /// <param name="fromPath">Excel模板路径</param>
+        /// <param name="toPath">Excel写入值路径</param>
+        public void WriteExcel_Dy(DataTable table, string sheetName, int rowBegin, int columnBegin, string fromPath, string toPath)
+        {
+            if (table == null)
+                return;
+            IWorkbook Workbook = null;
+
+            //using (FileStream SwFrom = new FileStream(fromPath, FileMode.Open))
+            //{
+                //try
+                //{
+                //    Workbook = new HSSFWorkbook(SwFrom);
+                //}
+                //catch
+                //{
+                    using (FileStream SwFromX = new FileStream(fromPath, FileMode.Open))
+                    {
+                        Workbook = new XSSFWorkbook(SwFromX);
+                    }
+              //  }
+
+          //  }
+
+            ISheet Sheet1 = Workbook.GetSheet(sheetName);
+
+            IRow Row = null;
+
+           // ICellStyle Style = Workbook.CreateCellStyle();
+           // Style.Alignment = HorizontalAlignment.Justify;//两端自动对齐（自动换行）
+           // Style.VerticalAlignment = VerticalAlignment.Center;
+           // IFont font = Workbook.CreateFont();
+           //// font.IsBold = true;                                 //加粗 
+           // //font.FontHeightInPoints = 12;                       //设置字体大小
+           // font.FontName = "仿宋";                         //设置字体
+           // Style.SetFont(font);                            //向样式里添加字体设置
+
+
+            ICellStyle StyleHead = Workbook.CreateCellStyle();
+            StyleHead.Alignment = HorizontalAlignment.Justify;//两端自动对齐（自动换行）
+            StyleHead.VerticalAlignment = VerticalAlignment.Justify;
+            IFont fontHead = Workbook.CreateFont();
+            fontHead.IsBold = true;                                 //加粗 
+            //fontHead.FontHeightInPoints = 12;                       //设置字体大小
+            fontHead.FontName ="微软雅黑";                         //设置字体
+            StyleHead.SetFont(fontHead);                            //向样式里添加字体设置
+
+
+            Sheet1.CreateFreezePane(0, 1, 0,1);
+
+            //Style.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+            //Style.BottomBorderColor = HSSFColor.Black.Index;
+            //Style.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
+            //Style.LeftBorderColor = HSSFColor.Black.Index;
+            //Style.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
+            //Style.RightBorderColor = HSSFColor.Black.Index;
+            //Style.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+            //Style.TopBorderColor = HSSFColor.Black.Index;
+
+            //double Numtemp = 0;
+
+            Row = Sheet1.CreateRow(0);
+
+            for (int j = 0; j < table.Columns.Count; j++)
+            {
+                ICell TableCell = null;
+               
+                TableCell = Row.CreateCell(j + columnBegin - 1);
+                TableCell.SetCellValue(table.Columns[j].ToString());
+                
+                TableCell.SetCellValue(table.Columns[j].ToString());
+                TableCell.CellStyle = StyleHead;
+
+            }
+
+
+
+            for (int i = 0; i < table.Rows.Count; i++)
+            {
+                ICellStyle Style = Workbook.CreateCellStyle();
+                if (i % 2 == 0)
+                {
+                   
+                    Style.Alignment = HorizontalAlignment.Justify;//两端自动对齐（自动换行）
+                    Style.VerticalAlignment = VerticalAlignment.Center;
+                    IFont font = Workbook.CreateFont();
+                    // font.IsBold = true;                                 //加粗 
+                    //font.FontHeightInPoints = 12;                       //设置字体大小
+                    font.FontName = "微软雅黑";                         //设置字体
+                    Style.SetFont(font);                            //向样式里添加字体设置
+                                                                    // Style.FillBackgroundColor = 1;
+
+                    Style.FillPattern = FillPattern.SolidForeground;
+                    Style.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.LightGreen.Index;
+
+                  
+                }
+                else
+                {
+
+                    Style.Alignment = HorizontalAlignment.Justify;//两端自动对齐（自动换行）
+                    Style.VerticalAlignment = VerticalAlignment.Center;
+                    IFont font = Workbook.CreateFont();
+                    // font.IsBold = true;                                 //加粗 
+                    //font.FontHeightInPoints = 12;                       //设置字体大小
+                    font.FontName = "微软雅黑";                         //设置字体
+                    Style.SetFont(font);                            //向样式里添加字体设置
+                                                                    // Style.FillBackgroundColor = 1;
+
+                    Style.FillPattern = FillPattern.NoFill;
+                    Style.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.White.Index;
+
+                  
+
+                }
+
+                Row = Sheet1.CreateRow(i + rowBegin - 1);
+                for (int j = 0; j < table.Columns.Count; j++)
+                {
+                    ICell TableCell = null;
+                    //if (double.TryParse(table.Rows[i][j].ToString(), out Numtemp))
+                    //{
+                    //    TableCell = Row.CreateCell(j + columnBegin - 1, CellType.Numeric);
+                    //    TableCell.SetCellValue(Numtemp);
+                    //}
+                    //else
+                    //{
+                        TableCell = Row.CreateCell(j + columnBegin - 1);
+                        TableCell.SetCellValue(table.Rows[i][j].ToString());
+                    //}
+                    TableCell.SetCellValue(table.Rows[i][j].ToString());
+
+                    TableCell.CellStyle = Style;
+
+
+                }
+
+                
+            }
+
+            using (FileStream SwTo = new FileStream(toPath, FileMode.OpenOrCreate))
+            {
+                Workbook.Write(SwTo);
+                SwTo.Close();
+            }
+
+        }
+
+        /// <summary>
         /// 把ExcelCell集合和DataTable写入Excel
         /// </summary>
         /// <param name="list">ExcelCell数据源集合</param>
