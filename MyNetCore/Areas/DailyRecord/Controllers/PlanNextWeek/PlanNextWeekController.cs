@@ -331,7 +331,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
 
 
         //用最少改动，不用管最优
-        public IActionResult ListExport(DateTime begDate, DateTime endDate)
+        public string ListExport(DateTime begDate, DateTime endDate)
         {
             begDate = new DateTime(begDate.Year, begDate.Month, begDate.Day);
             endDate = new DateTime(endDate.Year, endDate.Month, endDate.Day);
@@ -411,7 +411,18 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
             new ExcelHelper().WriteExcel_Dy(table, "sheet1", 2, 1, fromPath, toPath);
 
 
-            return Success(data: table.ToJsonString());//？？？
+            return toPath;
+        }
+
+
+        public IActionResult WeekReportListExport_url(DateTime begDate, DateTime endDate)
+        {
+            var exportExcelName = ListExport(begDate, endDate);
+            var subPath = exportExcelName.Substring(AppContext.BaseDirectory.Length);
+            var excelIpPort = "http://121.5.53.146:6453/";
+            //var excelIpPort = "http://192.168.1.3:8060/";
+
+            return Success(data: excelIpPort + System.Web.HttpUtility.UrlEncode(subPath.Replace("\\", "/")));
         }
     }
 }
