@@ -354,7 +354,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
             var WeeklyProjects = projectList.Select(x => x.ClassificationName).ToList();
 
             DataTable table = new DataTable();
-           // table.Columns.Add("编号", typeof(string));
+            table.Columns.Add("编号", typeof(string));
             table.Columns.Add("公司", typeof(string));
             table.Columns.Add("职责", typeof(string));
             table.Columns.Add("工程师", typeof(string));
@@ -390,7 +390,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                     continue;  //如果离职了且无该周计划，则跳过
                 }
                 DataRow dr = table.NewRow();
-               // dr["编号"] = item.UserOrder;
+                dr["编号"] = item.UserOrder;
                 dr["公司"] = item.Company;
                 dr["职责"] = item.Duty;
                 dr["工程师"] = item.UserName;
