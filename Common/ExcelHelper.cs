@@ -263,6 +263,98 @@ namespace Roim.Common
         }
 
         /// <summary>
+        /// 把DataTable写入Excel
+        /// </summary>
+        /// <param name="table">数据源</param>
+        /// <param name="sheetName">sheet名称</param>
+        /// <param name="rowBegin">开始行数</param>
+        /// <param name="columnBegin">开始列数</param>
+        /// <param name="fromPath">Excel模板路径</param>
+        /// <param name="toPath">Excel写入值路径</param>
+        public void WriteExcel_Dy(DataTable table, string sheetName, int rowBegin, int columnBegin, string fromPath, string toPath)
+        {
+            if (table == null)
+                return;
+            IWorkbook Workbook = null;
+
+            using (FileStream SwFromX = new FileStream(fromPath, FileMode.Open))
+            {
+                Workbook = new XSSFWorkbook(SwFromX);
+            }
+
+            ISheet Sheet1 = Workbook.GetSheet(sheetName);
+            Sheet1.CreateFreezePane(0, 1, 0, 1);
+
+            IRow Row = null;
+
+            #region 列头格式
+            ICellStyle StyleHead = Workbook.CreateCellStyle();
+            StyleHead.Alignment = HorizontalAlignment.Justify;//两端自动对齐（自动换行）
+            StyleHead.VerticalAlignment = VerticalAlignment.Justify;
+            IFont fontHead = Workbook.CreateFont();
+            fontHead.IsBold = true;                                 //加粗 
+            //fontHead.FontHeightInPoints = 12;                       //设置字体大小
+            fontHead.FontName = "微软雅黑";                         //设置字体
+            StyleHead.SetFont(fontHead);                            //向样式里添加字体设置
+            #endregion
+
+            Row = Sheet1.CreateRow(0);
+            for (int j = 0; j < table.Columns.Count; j++)
+            {
+                ICell TableCell = null;
+
+                TableCell = Row.CreateCell(j + columnBegin - 1);
+                TableCell.SetCellValue(table.Columns[j].ToString());
+
+                TableCell.CellStyle = StyleHead;
+            }
+
+            IFont font = Workbook.CreateFont();
+            // font.IsBold = true;                                 //加粗 
+            //font.FontHeightInPoints = 12;                       //设置字体大小
+            font.FontName = "微软雅黑";                         //设置字体
+
+            #region 偶数行格式
+            ICellStyle Style_even = Workbook.CreateCellStyle();
+            Style_even.Alignment = HorizontalAlignment.Justify;//两端自动对齐（自动换行）
+            Style_even.VerticalAlignment = VerticalAlignment.Center;
+            Style_even.SetFont(font);                            //向样式里添加字体设置
+            Style_even.FillPattern = FillPattern.SolidForeground;
+            Style_even.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.LightGreen.Index;
+            #endregion
+            
+            #region 奇数行格式
+            ICellStyle Style_odd = Workbook.CreateCellStyle();
+            Style_odd.Alignment = HorizontalAlignment.Justify;//两端自动对齐（自动换行）
+            Style_odd.VerticalAlignment = VerticalAlignment.Center;
+            Style_odd.SetFont(font);                            //向样式里添加字体设置
+            Style_odd.FillPattern = FillPattern.NoFill;
+            Style_odd.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.White.Index;
+            #endregion
+
+            for (int i = 0; i < table.Rows.Count; i++)
+            {
+                Row = Sheet1.CreateRow(i + rowBegin - 1);
+                for (int j = 0; j < table.Columns.Count; j++)
+                {
+                    ICell TableCell = null;
+
+                    TableCell = Row.CreateCell(j + columnBegin - 1);
+                    TableCell.SetCellValue(table.Rows[i][j].ToString());
+
+                    TableCell.CellStyle = i % 2 == 0 ? Style_even : Style_odd;
+                }
+            }
+
+            using (FileStream SwTo = new FileStream(toPath, FileMode.OpenOrCreate))
+            {
+                Workbook.Write(SwTo);
+                SwTo.Close();
+            }
+        }
+
+
+        /// <summary>
         /// 把ExcelCell集合和DataTable写入Excel
         /// </summary>
         /// <param name="list">ExcelCell数据源集合</param>
@@ -973,7 +1065,7 @@ namespace Roim.Common
             ExcelHelper helper = new ExcelHelper();
             DataTable table = helper.ExcelToDataTable(path, sheetName);
 
-            if(table == null || table.Rows.Count == 0)
+            if (table == null || table.Rows.Count == 0)
             {
                 return null;
             }
@@ -990,7 +1082,7 @@ namespace Roim.Common
                 foreach (DataColumn itemColumn in table.Columns)
                 {
                     property = typeof(T).GetProperty(itemColumn.ColumnName);
-                    if(property == null)
+                    if (property == null)
                     {
                         continue;
                     }
