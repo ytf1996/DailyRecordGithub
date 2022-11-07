@@ -253,8 +253,8 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
             };
             List<string> speCellNameList_summary = new List<string>{
                 "yyyyMM",
-                "ChargeDayNum",
-                "BisTripDayNum"
+                "ChargeDayNum"//,
+                //"BisTripDayNum"
             };
             using (FileStream stream = new FileStream(templateExcelName, FileMode.Open, FileAccess.Read))
             {
