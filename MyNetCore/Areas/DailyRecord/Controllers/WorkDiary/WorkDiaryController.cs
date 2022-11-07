@@ -253,8 +253,8 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
             };
             List<string> speCellNameList_summary = new List<string>{
                 "yyyyMM",
-                "ChargeDayNum"//,
-                //"BisTripDayNum"
+                "ChargeDayNum",
+                "BisTripDayNum"
             };
             using (FileStream stream = new FileStream(templateExcelName, FileMode.Open, FileAccess.Read))
             {
@@ -346,13 +346,19 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                                 string valyyyyMM = yearMonth.ToString("yyyy/MM");
                                 cell.SetCellValue(valyyyyMM);
                                 break;
+                            //case "ChargeDayNum":
+                            //    double valChargeDayNum = curUserWorkDiaryList.Sum(x => x.SubtotalWorkHour ?? 0);
+                            //    cell.SetCellValue(valChargeDayNum);
+                            //    break;
+                            //case "BisTripDayNum":
+                            //    double valBisTripDayNum = curUserWorkDiaryList.Where(x => x.SubtotalWorkHour != null && x.SubtotalWorkHour != 0 && (x.WhetherOnBusinessTrip ?? false)).Count();
+                            //    cell.SetCellValue(valBisTripDayNum);
+                            //    break;
+
                             case "ChargeDayNum":
+                            case "BisTripDayNum":
                                 double valChargeDayNum = curUserWorkDiaryList.Sum(x => x.SubtotalWorkHour ?? 0);
                                 cell.SetCellValue(valChargeDayNum);
-                                break;
-                            case "BisTripDayNum":
-                                double valBisTripDayNum = curUserWorkDiaryList.Where(x => x.SubtotalWorkHour != null && x.SubtotalWorkHour != 0 && (x.WhetherOnBusinessTrip ?? false)).Count();
-                                cell.SetCellValue(valBisTripDayNum);
                                 break;
                             default:
                                 break;
