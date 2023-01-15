@@ -6,6 +6,7 @@ using NPOI.XSSF.UserModel;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -289,6 +290,11 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
             WorkDiaryInfo.projectList = new BusinessJobClassification().GetList(null, out _, null).ToList();
             using (FileStream stream = new FileStream(exportExcelName, FileMode.Create, FileAccess.Write))  // If the file already exists, it will be overwritten. 
             {
+                IFont contentFont = downLoadWorkBook.CreateFont();
+                contentFont.FontHeightInPoints = 8;
+                contentFont.FontName = "微软雅黑";
+                float contentCellWidth = GetTextWidth(contentFont, "测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测");
+
                 foreach (var userId in userAccounts)  //对每个用户循环处理
                 {
                     var userInfo = userExpList.Where(x => x.Id == userId).FirstOrDefault();
@@ -311,7 +317,9 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
 
                         curUserWorkDiaryList.ForEach(userDiary =>
                         {
-                            ICell cell = curUserSheet.GetRow(x++).GetCell(y);
+                            var ICurRow = curUserSheet.GetRow(x++);
+
+                            ICell cell = ICurRow.GetCell(y);
 
                             if (cellName == nameof(WorkDiaryInfo.NormalWorkHour) || cellName == nameof(WorkDiaryInfo.ExtraWorkHour) || cellName == nameof(WorkDiaryInfo.SubtotalWorkHour))
                             {
@@ -328,6 +336,53 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                             else if (cellName == nameof(WorkDiaryInfo.JobClassificationInfoIdExport))
                             {
                                 cell.SetCellValue((string)null);
+                            }
+                            else if (cellName == nameof(WorkDiaryInfo.JobContent))
+                            {
+                                cell.SetCellValue(propertyInfo.GetValue(userDiary)?.ToString());
+
+                                if (cell.CellType == CellType.String && !string.IsNullOrWhiteSpace(cell.StringCellValue))
+                                {
+                                    var list = cell.StringCellValue.Split('\n', '\r').ToList();
+                                    int lineNum = 0;
+                                    list.ForEach(item =>
+                                    {
+                                        float widthTmp = GetTextWidth(contentFont, item);
+                                        lineNum += Convert.ToInt32(Math.Ceiling((double)(widthTmp / contentCellWidth)));
+                                    });
+
+                                    //var height1 = GetTextCommonHeight(contentFont, "测");
+                                    //var height2 = GetTextCommonHeight(contentFont, "测\n测");
+                                    //var height3 = GetTextCommonHeight(contentFont, "测\n测\n测");
+                                    //var height4 = GetTextCommonHeight(contentFont, "测\n测\n测\n测");
+
+                                    var innerGap = 1;
+                                    var borderGap = 1.5f;
+                                    var textSize = 12.5f;
+
+                                    ICurRow.HeightInPoints = 2 * borderGap + lineNum * textSize + (lineNum - 1) * innerGap;
+
+                                    if (lineNum == 1)
+                                    {
+                                        ICurRow.HeightInPoints += 2;
+                                    }
+                                    else if (lineNum == 2)
+                                    {
+                                        ICurRow.HeightInPoints += 1;
+                                    }
+                                    else if (lineNum >= 3)
+                                    {
+                                        ICurRow.HeightInPoints -= (lineNum - 2);
+                                    }
+                                    else if (lineNum >= 6)
+                                    {
+                                        ICurRow.HeightInPoints -= 3 * (lineNum - 2);
+                                    }
+                                    else if (lineNum >= 9)
+                                    {
+                                        ICurRow.HeightInPoints -= 9 * (lineNum - 2);
+                                    }
+                                }
                             }
                             else
                             {
@@ -373,6 +428,27 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
             return exportExcelName;
         }
 
+        public static float GetTextWidth(IFont font, string text)
+        {
+            using (var bitmap = new Bitmap(1, 1))
+            {
+                var graphics = Graphics.FromImage(bitmap);
+                var size1 = graphics.MeasureString(text, new Font(font.FontName, (float)font.FontHeightInPoints));
+
+                return size1.Width;
+            }
+        }
+
+        //public static float GetTextCommonHeight(IFont font, string text)
+        //{
+        //    using (var bitmap = new Bitmap(1, 1))
+        //    {
+        //        var graphics = Graphics.FromImage(bitmap);
+        //        var size1 = graphics.MeasureString(text, new Font(font.FontName, (float)font.FontHeightInPoints));
+
+        //        return size1.Height;
+        //    }
+        //}
 
         public IActionResult ExportDailyReport_base64string(DateTime yearMonth, string contractedSupplier)
         {
