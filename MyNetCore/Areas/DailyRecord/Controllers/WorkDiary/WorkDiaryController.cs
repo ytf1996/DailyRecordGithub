@@ -382,18 +382,6 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                                     //{
                                     //    ICurRow.HeightInPoints -= 9 * (lineNum - 2);
                                     //}
-
-
-                                    var gx = Graphics.FromHwnd(IntPtr.Zero);
-                                    var xFont = cell.CellStyle.GetFont(.downLoadWorkBook); //单元格字体
-                                    var font = new Font(xFont.FontName, (float)xFont.FontHeightInPoints); //emSize单位为磅
-                                    var textWidth = gx.MeasureString(text, font).ToSize().Width; //GDI+计算文本长度
-                                    var columnWidth = cell.Sheet.GetColumnWidthInPixels(cell.ColumnIndex);
-                                    var rowCount = Math.Ceiling(textWidth / columnWidth); //行数 = 文本宽度 / 列宽
-                                    var tmpRowHeight = (short)(Math.Ceiling(xFont.FontHeight) * rowCount); //行高 = 行数 * 字高
-                                                                                                           //若原行高，小于当前，则设为新行高
-                                    if (cell.Sheet.GetRow(cell.RowIndex).Height < tmpRowHeight)
-                                        cell.Sheet.GetRow(cell.RowIndex).Height = tmpRowHeight;
                                 }
                             }
                             else
