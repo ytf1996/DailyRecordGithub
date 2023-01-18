@@ -293,7 +293,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 IFont contentFont = downLoadWorkBook.CreateFont();
                 contentFont.FontHeightInPoints = 8;
                 contentFont.FontName = "微软雅黑";
-                float contentCellWidth = GetTextWidth(contentFont, "测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测");
+                float contentCellWidth = GetTextWidth(contentFont, "测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测测");
 
                 foreach (var userId in userAccounts)  //对每个用户循环处理
                 {
@@ -351,37 +351,49 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                                         lineNum += Convert.ToInt32(Math.Ceiling((double)(widthTmp / contentCellWidth)));
                                     });
 
-                                    //var height1 = GetTextCommonHeight(contentFont, "测");
+                                    var height1 = GetTextCommonHeight(contentFont, "测");
                                     //var height2 = GetTextCommonHeight(contentFont, "测\n测");
                                     //var height3 = GetTextCommonHeight(contentFont, "测\n测\n测");
                                     //var height4 = GetTextCommonHeight(contentFont, "测\n测\n测\n测");
 
-                                    var innerGap = 1;
-                                    var borderGap = 1.5f;
-                                    var textSize = 12.5f;
+                                    var innerGap = height1 / 15 * 1;
+                                    var borderGap = height1 / 15 * 1.5f;
+                                    var textSize = height1 / 15 * 12.5f;
 
-                                    ICurRow.HeightInPoints = 2 * borderGap + lineNum * textSize + (lineNum - 1) * innerGap;
+                                    ICurRow.HeightInPoints = 2 * borderGap + lineNum * textSize + (lineNum - 1) * innerGap + 10;
 
-                                    if (lineNum == 1)
-                                    {
-                                        ICurRow.HeightInPoints += 2;
-                                    }
-                                    else if (lineNum == 2)
-                                    {
-                                        ICurRow.HeightInPoints += 1;
-                                    }
-                                    else if (lineNum >= 3)
-                                    {
-                                        ICurRow.HeightInPoints -= (lineNum - 2);
-                                    }
-                                    else if (lineNum >= 6)
-                                    {
-                                        ICurRow.HeightInPoints -= 3 * (lineNum - 2);
-                                    }
-                                    else if (lineNum >= 9)
-                                    {
-                                        ICurRow.HeightInPoints -= 9 * (lineNum - 2);
-                                    }
+                                    //if (lineNum == 1)
+                                    //{
+                                    //    ICurRow.HeightInPoints += 9;
+                                    //}
+                                    //else if (lineNum == 2)
+                                    //{
+                                    //    ICurRow.HeightInPoints += 4;
+                                    //}
+                                    //else if (lineNum >= 3)
+                                    //{
+                                    //    ICurRow.HeightInPoints -= (lineNum - 1);
+                                    //}
+                                    //else if (lineNum >= 6)
+                                    //{
+                                    //    ICurRow.HeightInPoints -= 3 * (lineNum - 2);
+                                    //}
+                                    //else if (lineNum >= 9)
+                                    //{
+                                    //    ICurRow.HeightInPoints -= 9 * (lineNum - 2);
+                                    //}
+
+
+                                    var gx = Graphics.FromHwnd(IntPtr.Zero);
+                                    var xFont = cell.CellStyle.GetFont(.downLoadWorkBook); //单元格字体
+                                    var font = new Font(xFont.FontName, (float)xFont.FontHeightInPoints); //emSize单位为磅
+                                    var textWidth = gx.MeasureString(text, font).ToSize().Width; //GDI+计算文本长度
+                                    var columnWidth = cell.Sheet.GetColumnWidthInPixels(cell.ColumnIndex);
+                                    var rowCount = Math.Ceiling(textWidth / columnWidth); //行数 = 文本宽度 / 列宽
+                                    var tmpRowHeight = (short)(Math.Ceiling(xFont.FontHeight) * rowCount); //行高 = 行数 * 字高
+                                                                                                           //若原行高，小于当前，则设为新行高
+                                    if (cell.Sheet.GetRow(cell.RowIndex).Height < tmpRowHeight)
+                                        cell.Sheet.GetRow(cell.RowIndex).Height = tmpRowHeight;
                                 }
                             }
                             else
@@ -439,16 +451,16 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
             }
         }
 
-        //public static float GetTextCommonHeight(IFont font, string text)
-        //{
-        //    using (var bitmap = new Bitmap(1, 1))
-        //    {
-        //        var graphics = Graphics.FromImage(bitmap);
-        //        var size1 = graphics.MeasureString(text, new Font(font.FontName, (float)font.FontHeightInPoints));
+        public static float GetTextCommonHeight(IFont font, string text)
+        {
+            using (var bitmap = new Bitmap(1, 1))
+            {
+                var graphics = Graphics.FromImage(bitmap);
+                var size1 = graphics.MeasureString(text, new Font(font.FontName, (float)font.FontHeightInPoints));
 
-        //        return size1.Height;
-        //    }
-        //}
+                return size1.Height;
+            }
+        }
 
         public IActionResult ExportDailyReport_base64string(DateTime yearMonth, string contractedSupplier)
         {
