@@ -301,7 +301,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         /// </summary>
         /// <param name="pPlanNextWeekInfo"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpDelete]
         public IActionResult Delete(List<int> idList)
         {
             var currentUser = GetCurrentUserInfo();
