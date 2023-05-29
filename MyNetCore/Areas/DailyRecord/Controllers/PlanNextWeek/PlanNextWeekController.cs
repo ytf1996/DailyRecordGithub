@@ -301,8 +301,8 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         /// </summary>
         /// <param name="pPlanNextWeekInfo"></param>
         /// <returns></returns>
-        [HttpDelete]
-        public IActionResult Delete(/*List<int> idList*/int id)
+        [HttpPost]
+        public IActionResult Delete(List<int> idList)
         {
             var currentUser = GetCurrentUserInfo();
             if (currentUser == null)
@@ -310,8 +310,8 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 throw new Exception("用户未登录");
             }
 
-            //foreach (var id in idList)
-            //{
+            foreach (var id in idList)
+            {
                 var pPlanNextWeekInfoDB = _businessPlanNextWeek.GetById(id);
                 if (pPlanNextWeekInfoDB == null)
                 {
@@ -323,7 +323,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
                 }
 
                 _businessPlanNextWeek.Delete(pPlanNextWeekInfoDB);
-            //}
+            }
 
             return Success();
         }

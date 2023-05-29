@@ -171,7 +171,7 @@ namespace MyNetCore.Areas.DailyRecord.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpDelete]
+        [HttpPost]
         public IActionResult Delete(int id)
         {
             var currentUser = GetCurrentUserInfo();
