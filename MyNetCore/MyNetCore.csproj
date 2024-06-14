@@ -78,6 +78,9 @@
 
 
   <ItemGroup>
+    <None Update="Excel\周报导出模板.xlsx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Excel\日志导出模板.xlsx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
