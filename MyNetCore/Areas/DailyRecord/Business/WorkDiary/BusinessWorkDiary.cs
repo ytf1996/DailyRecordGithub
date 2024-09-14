@@ -36,34 +36,46 @@ namespace MyNetCore.Business
 
         public void AddDefaultItemWhenNotexist(List<WorkDiaryInfo> list, DateTime begDate)
         {
-            var calendarList = GetHoliday(begDate.ToString("yyyyMM"));
+            var calendarList = new List<EachDayInfo>();
+
+            var emptyList= new List<DateTime>();
             for (var dt = begDate; dt < begDate.AddMonths(1); dt = dt.AddDays(1))
             {
                 var item = list.Where(x => x.Dt == dt).FirstOrDefault();
                 if (item == null)
                 {
-                    var calendarItem = calendarList.Where(x => x.Date == dt.ToString("yyyyMMdd")).FirstOrDefault();
-                    dynamic isWorkDay;
-                    if (calendarItem != null)
-                        isWorkDay = calendarItem?.Workday == WorkOrHoliday.WorkDay;
-                    else
-                        isWorkDay = dt.DayOfWeek != DayOfWeek.Saturday && dt.DayOfWeek != DayOfWeek.Sunday;
-                    item = new WorkDiaryInfo
-                    {
-                        Dt = dt,
-                        WhatDay = (int)dt.DayOfWeek,
-                        WhetherOnBusinessTrip = true,
-                    };
-                    if (isWorkDay)
-                    {
-                        item.BegWorkTime = dt.AddHours(8);
-                        item.EndWorkTime = dt.AddHours(17);
-                        item.NormalWorkHour = isWorkDay ? 8 : 0;
-                        item.ExtraWorkHour = 0;
-                        item.SubtotalWorkHour = Math.Round((((item.NormalWorkHour ?? 0) + (item.ExtraWorkHour ?? 0)) / 8), 2);
-                    }
-                    Add(item);
+                    emptyList.Add(dt);
                 }
+            }
+
+            if (emptyList.Count>0)
+            {
+                calendarList = GetHoliday(begDate.ToString("yyyyMM"));
+            }
+
+            foreach (var dt in emptyList)
+            {
+                var calendarItem = calendarList.Where(x => x.Date == dt.ToString("yyyyMMdd")).FirstOrDefault();
+                dynamic isWorkDay;
+                if (calendarItem != null)
+                    isWorkDay = calendarItem?.Workday == WorkOrHoliday.WorkDay;
+                else
+                    isWorkDay = dt.DayOfWeek != DayOfWeek.Saturday && dt.DayOfWeek != DayOfWeek.Sunday;
+                var item = new WorkDiaryInfo
+                {
+                    Dt = dt,
+                    WhatDay = (int)dt.DayOfWeek,
+                    WhetherOnBusinessTrip = true,
+                };
+                if (isWorkDay)
+                {
+                    item.BegWorkTime = dt.AddHours(8);
+                    item.EndWorkTime = dt.AddHours(17);
+                    item.NormalWorkHour = isWorkDay ? 8 : 0;
+                    item.ExtraWorkHour = 0;
+                    item.SubtotalWorkHour = Math.Round((((item.NormalWorkHour ?? 0) + (item.ExtraWorkHour ?? 0)) / 8), 2);
+                }
+                Add(item);
             }
         }
 
@@ -79,7 +91,7 @@ namespace MyNetCore.Business
             {
                 WebClient client = new WebClient();
                 client.Encoding = Encoding.UTF8;
-                var url = $"https://api.apihubs.cn/holiday/get?api_key=efa9c6e30151e04a7e186141f576f14beb65&month={yyyyMM}";
+                var url = $"https://api.apihubs.cn/holiday/get?api_key=eaa22f560e957044f71a34112fd1d01eb2f5&month={yyyyMM}";
                 var jsondata = client.DownloadString(url);
 
                 var model = JsonConvert.DeserializeObject<Calendar>(jsondata);
